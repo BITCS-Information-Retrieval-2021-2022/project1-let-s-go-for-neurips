@@ -26,7 +26,7 @@ ROBOTSTXT_OBEY = False
 START_TIME = datetime.datetime.now()
 PROXY_UPDATE_DELAY = 5
 # URL
-ACM_URL = ['https://dl.acm.org/action/doSearch?ConceptID=1']
+ACM_URL = ['https://dl.acm.org/action/doSearch?ConceptID=1024']
 
 # Retry Setting
 # Retry many times since proxies often fail
@@ -37,7 +37,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
 # Proxy Setting
 # RANDOM_UA_TYPE = 'random'  # 或者指定浏览器 firefox、chrome...
-PROXY_LIST = 'Reptiles/proxylist.txt'
+PROXY_LIST = './proxylist.txt'
 # 代理模式
 # 0 = Every requests have different proxy
 # 1 = Take only one proxy from the list and assign it to every requests
@@ -73,3 +73,7 @@ DOWNLOADER_MIDDLEWARES = {
 #ITEM_PIPELINES = {
 #    'Reptiles.pipelines.AcaspiderPipeline': 300,
 #}
+
+LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day, START_TIME.hour)
+LOG_LEVEL = 'WARNING'
+LOG_FILE = LOG_FILE_PATH
