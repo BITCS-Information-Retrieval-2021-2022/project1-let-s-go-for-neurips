@@ -24,6 +24,7 @@ ROBOTSTXT_OBEY = False
 
 # Time
 START_TIME = datetime.datetime.now()
+PROXY_UPDATE_DELAY = 5
 # URL
 ACM_URL = ['https://dl.acm.org/action/doSearch?ConceptID=1']
 
@@ -35,7 +36,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
 
 # Proxy Setting
-RANDOM_UA_TYPE = 'random'  # 或者指定浏览器 firefox、chrome...
+# RANDOM_UA_TYPE = 'random'  # 或者指定浏览器 firefox、chrome...
 PROXY_LIST = 'Reptiles/proxylist.txt'
 # 代理模式
 # 0 = Every requests have different proxy
