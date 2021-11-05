@@ -52,3 +52,4 @@ wheel=0.37.0=pyhd3eb1b0_1
 wincertstore=0.2=py38haa95532_2
 wsproto=1.0.0=pypi_0
 zope-interface=5.4.0=pypi_0
+pymongo=3.12.1
