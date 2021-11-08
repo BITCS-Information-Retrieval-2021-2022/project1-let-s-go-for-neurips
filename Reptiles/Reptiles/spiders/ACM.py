@@ -28,6 +28,7 @@ class AcmSpider(scrapy.Spider):
         
         for paper_item in paper_items:
             print(paper_item)
+            logging.warning("This is a Href",paper_item)
 
 
         if (self.startPage + 1) * self.pageSize < int(results_num) and self.startPage < 1:
