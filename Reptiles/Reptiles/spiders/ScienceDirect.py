@@ -28,7 +28,6 @@ class SciencedirectSpider(scrapy.Spider):
             tokenstr = re.findall('"searchToken":.*"}', paper_item.extract())
             if len(tokenstr) > 0:
                 token = tokenstr[0][15:-2]
-                break
 
         next_url = self.search_api + "date=" + str(self.date) + "&offset=" + str(self.offset) + "&t=" + str(token) + "&hostname=" + str(self.hostname)
         yield scrapy.Request(
