@@ -14,7 +14,6 @@ class getProxy:
 
     def getHtml(self):
         rnd = random.randint(1,4000)
-        print('')
         res = requests.get(self.url+str(rnd), headers=self.headers)
         res.encoding = 'utf-8'
         html = res.text
@@ -24,7 +23,7 @@ class getProxy:
         lst = []
         # todo
         parsehtml = etree.HTML(html)
-        print(parsehtml)
+        #print(parsehtml)
         time.sleep(1)
         iplist = parsehtml.xpath('//*[@id="list"]/table/tbody/tr/td[1]')
         portlist = parsehtml.xpath('//*[@id="list"]/table/tbody/tr/td[2]')
@@ -38,7 +37,7 @@ class getProxy:
                     write_text = n.text + '://' + x.text + ':' + y.text + '\n'
                     self.writeComment(write_text)
                     num += 1
-        print('共采集代理：',num)
+        #print('共采集代理：',num)
 
     def writeComment(self, lst):
          with open(self.path, 'a') as f:
@@ -48,7 +47,8 @@ class getProxy:
     def main(self):
         if os.path.exists(self.path):
             os.remove(self.path)
-        self.getHtml()
+        for _ in range(2):
+            self.getHtml()
 
 
 if __name__ == '__main__':

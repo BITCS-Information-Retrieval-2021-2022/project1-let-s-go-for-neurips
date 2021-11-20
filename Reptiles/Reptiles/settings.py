@@ -24,9 +24,9 @@ ROBOTSTXT_OBEY = False
 
 # Time
 START_TIME = datetime.datetime.now()
-PROXY_UPDATE_DELAY = 5
+PROXY_UPDATE_DELAY = 300
 # URL
-ACM_URL = ['https://dl.acm.org/action/doSearch?ConceptID=1024']
+ACM_URL = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&AfterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
 
 # Retry Setting
 # Retry many times since proxies often fail
@@ -51,7 +51,7 @@ PROXY_MODE = 0
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 6
+DOWNLOAD_DELAY = 1
 
 
 # Enable or disable spider middlewares
@@ -74,6 +74,12 @@ DOWNLOADER_MIDDLEWARES = {
 #    'Reptiles.pipelines.AcaspiderPipeline': 300,
 #}
 
+CONCURRENT_REQUESTS_PER_DOMAIN = 30
+# 下面两个二选一，一个是针对域名设置并发，一个是针对IP设置并发
+CONCURRENT_REQUESTS_PER_IP = 30
+CONCURRENT_REQUESTS_PER_DOMAIN = 30
+
+
 LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day, START_TIME.hour)
-LOG_LEVEL = 'WARNING'
+LOG_LEVEL = 'INFO'
 LOG_FILE = LOG_FILE_PATH

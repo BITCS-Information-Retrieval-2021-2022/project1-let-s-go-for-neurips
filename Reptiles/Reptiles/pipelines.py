@@ -12,6 +12,7 @@ import re
 class ReptilesPipeline:
     def __init__(self):
         self.client = pymongo.MongoClient(host='127.0.0.1', port=27017, tz_aware=True)
+
     def process_item(self, item, spider):
         docs = self.client.pc.docs
         info = dict(item)
