@@ -8,21 +8,41 @@ import re
 class SciencedirectSpider(scrapy.Spider):
     name = 'ScienceDirect'
     allowed_domains = ['www.sciencedirect.com']
-    # start_urls = ['https://www.sciencedirect.com/search/api?date=2021&offset=0&t=a8NiX7cJ6Qjx6Ozy%252FMF7xdJCd4wsZKGrg1Kz0n3mskmaa%252F8but7D8hb5%252FOlDboRY3jly8Pxl8wHpgRGwuh72ffyEBYpstp27OHDv1eT9n3DAQzsTjPv7ev%252B2vDpH%252BN1MvKdDbfVcomCzYflUlyb3MA%253D%253D&hostname=www.sciencedirect.com']
     start_urls = ['https://www.sciencedirect.com/search?date=2020']
 
     def __init__(self):
         super(SciencedirectSpider, self).__init__()
-        self.search_api = 'https://www.sciencedirect.com/search/api?'
-        self.date = 2020
-        self.offset = 0
-        self.hostname = 'www.sciencedirect.com'
 
     def parse(self, response):
         # f1 = open('test.html', 'w')
         # f1.write(response.text)
         # f1.close()
         logging.info('parse ' + response.url)
+        for page in range(1, 46, 1):
+            next_url = 'https://www.sciencedirect.com/browse/journals-and-books?contentType=JL&page=' + str(page)
+            yield scrapy.Request(
+                url=next_url,
+                callback=self.parse_venue_list,
+            )
+            break
+
+
+    def parse_venue_list(self, response):
+        logging.info('parse_venue_list ' + response.url)
+        venues = response.xpath('//li[@class="publication branded u-padding-xs-ver js-publication"]/a/span/text()')
+        for venue in venues:
+            venue = venue.extract()
+            for date in range(1995, 2022, 1):
+                next_url = 'https://www.sciencedirect.com/search?date=' + str(date) + "&pub=" + str(venue) + "&show=100&offset=" + str(self.offset)
+                yield scrapy.Request(
+                    url=next_url,
+                    callback=self.parse_token,
+                )
+            break
+        break
+    
+    def parse_token(self, response):
+        logging.info('parse_token ' + response.url)
         scripts = response.xpath('//script')
         token = ''
         for paper_item in scripts:
@@ -33,17 +53,15 @@ class SciencedirectSpider(scrapy.Spider):
                 break
         if token == '':
             logging.error('not find token ' + response.url)
-
-        next_url = self.search_api + "date=" + str(self.date) + "&show=100&offset=" + str(self.offset) + "&t=" + str(token) + "&hostname=" + str(self.hostname)
+        
+        next_url = re.sub('https://www.sciencedirect.com/search', 'https://www.sciencedirect.com/search/api', response.url) + '&t=' + token
         yield scrapy.Request(
             url=next_url,
-            callback=self.parse_list,
+            callback=self.parse_paper_list,
         )
 
-
-
-    def parse_list(self, response):
-        logging.info('parse_list ' + response.url)
+    def parse_paper_list(self, response):
+        logging.info('parse_paper_list ' + response.url)
         results = json.loads(response.text)
         for paper_item in results['searchResults']:
             link = paper_item['link']
@@ -52,14 +70,23 @@ class SciencedirectSpider(scrapy.Spider):
                 url=next_url,
                 callback=self.parse_read,
             )
-
-        if len(results['searchResults']) > 0:
-            self.offset += len(results['searchResults'])
-            next_url = re.sub("&offset=.&", "&offset=" + str(self.offset) + "&", response.url)
-            yield scrapy.Request(
-                url=next_url,
-                callback=self.parse_list,
-            )
+            break
+        resultsFound = 0
+        for paper_item in scripts:
+            tmpstr = re.search('"resultsFound":"[0-9]*"', paper_item.extract())
+            if tmpstr is not None:
+                tmpstr = tmpstr.group()
+                resultsFound = tmpstr[15:-1]
+                break
+        print('resultsFound', resultsFound)
+        raise NotImplemented
+        # if len(results['searchResults']) > 0:
+        #     self.offset += len(results['searchResults'])
+        #     next_url = re.sub("&offset=.&", "&offset=" + str(self.offset) + "&", response.url)
+        #     yield scrapy.Request(
+        #         url=next_url,
+        #         callback=self.parse_paper_list,
+        #     )
 
     def parse_read(self, response):
         # f1 = open('test.html', 'w')
@@ -123,9 +150,7 @@ class SciencedirectSpider(scrapy.Spider):
         yield scrapy.Request(
                 url=next_url,
                 callback=self.parse_read1,
-                meta={
-                    'item':item,
-                }
+                meta={'item':item}
             )
     
     def parse_read1(self, response):
