@@ -71,8 +71,11 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'Reptiles.pipelines.ReptilesPipeline': 100
+    'Reptiles.pipelines.ReptilesPipeline': 100,
+    'Reptiles.pipelines.PDFPipeline':150
 }
+FILES_STORE = '../PDF/'
+
 
 LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day)
 LOG_LEVEL = 'INFO'
