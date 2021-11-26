@@ -5,9 +5,14 @@
 
 
 # useful for handling different item types with a single interface
+import logging
 from itemadapter import ItemAdapter
+from scrapy.pipelines.files import FilesPipeline
 import pymongo
+import scrapy
 import re
+from urllib.parse import urlparse
+from os.path import basename,dirname,join
 
 
 class ReptilesPipeline:
@@ -25,3 +30,10 @@ class ReptilesPipeline:
         # 如果checksum已存在则对已有数据进行更新，否则插入
         docs.update({'checksum': info['checksum']}, {'$set': info}, True)
         return item
+
+class PDFPipeline(FilesPipeline):
+    def  get_media_requests(self, item, info):
+        yield scrapy.Request(item["pdf_url"], meta={"path": item["pdf_path"]})
+    
+    def file_path(self, request, response=None, info=None):
+        return request.meta.get("path")
