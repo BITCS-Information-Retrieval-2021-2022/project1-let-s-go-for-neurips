@@ -1,17 +1,19 @@
 import pymongo
 import re
 
+
 class MongoManager:
     def __init__(self):
-        self.myclient = pymongo.MongoClient(host='127.0.0.1', port=27017, tz_aware=True)
+        self.myclient = pymongo.MongoClient(host='10.1.114.77', port=27017, tz_aware=True)
         self.dblist = self.myclient.list_database_names()
         self.mydb = None
         self.collist = None
         self.mycol = None
 
+
 class MongoManager:
     def __init__(self):
-        self.myclient = pymongo.MongoClient(host='127.0.0.1', port=27017, tz_aware=True)
+        self.myclient = pymongo.MongoClient(host='10.1.114.77', port=27017, tz_aware=True)
         self.dblist = self.myclient.list_database_names()
         self.mydb = None
         self.collist = None
@@ -46,3 +48,15 @@ class MongoManager:
         document = docs.find({field: value})
 
         return document
+
+
+if __name__ == '__main__':
+    db = MongoManager()
+    db.mongodb_insert("Process", {
+        'title':'ACM',
+        'year': 2021,
+        'month': 11,
+        'day': 23,
+        'startPage': 0,
+        'PageSize': 20
+    })
