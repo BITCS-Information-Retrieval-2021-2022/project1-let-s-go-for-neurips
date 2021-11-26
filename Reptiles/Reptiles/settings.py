@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import datetime
 
-BOT_NAME = 'Reptiles'
+BOT_NAME = 'ACM'
 
 SPIDER_MODULES = ['Reptiles.spiders']
 NEWSPIDER_MODULE = 'Reptiles.spiders'
@@ -33,7 +33,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
 # Proxy Setting
 # RANDOM_UA_TYPE = 'random'  # 或者指定浏览器 firefox、chrome...
-PROXY_LIST = './proxylist.txt'
+PROXY_LIST = './proxylist_big.txt'
 # 代理模式
 # 0 = Every requests have different proxy
 # 1 = Take only one proxy from the list and assign it to every requests
@@ -71,9 +71,10 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'Reptiles.pipelines.ReptilesPipeline': 100
+    'Reptiles.pipelines.ReptilesPipeline': 100,
+    'Reptiles.pipelines.PDFPipeline': 200,
 }
 
-LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day)
+LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day,BOT_NAME)
 LOG_LEVEL = 'INFO'
 LOG_FILE = LOG_FILE_PATH

@@ -10,8 +10,8 @@ class getProxy:
     def __init__(self):
         self.url = 'https://www.kuaidaili.com/free/inha/'
         self.headers = self.headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/536.36'}
-        self.path = 'proxylist_new.txt'
+            'user-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20120101 Firefox/29.0'}
+        self.path = 'proxylist.txt'
         self.index = 0
 
     def getHtml(self):
@@ -50,12 +50,21 @@ class getProxy:
     def main(self):
         # if os.path.exists(self.path):
         #     os.remove(self.path)
-        for i in range(190,4000):
+        for i in range(0,185):
             print(i)
             self.index = i + 1
             self.getHtml()
+
+    def process_proxy(self):
+        with open(self.path, 'r') as f:
+            proxy = f.readlines()
+        with open('proxylist_new.txt', 'a') as f:
+            for p in proxy:
+                print(p)
+                f.write('HTTP://'+p)
 
 
 if __name__ == '__main__':
     proxy = getProxy()
     proxy.main()
+    #proxy.process_proxy()

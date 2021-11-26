@@ -5,6 +5,24 @@ import json
 import logging
 import re
 
+
+wordtonumber = {
+    'January': '1',
+    'February': '2',
+    'March': '3',
+    'April': '4',
+    'May': '5',
+    'June': '6',
+    'July': '7',
+    'August': '8',
+    'September': '9',
+    'October': '10',
+    'November': '11',
+    'December': '12',
+
+}
+
+
 class SciencedirectSpider(scrapy.Spider):
     name = 'ScienceDirect'
     allowed_domains = ['www.sciencedirect.com']
@@ -24,7 +42,6 @@ class SciencedirectSpider(scrapy.Spider):
                 url=next_url,
                 callback=self.parse_venue_list,
             )
-            break
 
 
     def parse_venue_list(self, response):
@@ -33,13 +50,12 @@ class SciencedirectSpider(scrapy.Spider):
         for venue in venues:
             venue = venue.extract()
             for date in range(1995, 2022, 1):
-                next_url = 'https://www.sciencedirect.com/search?date=' + str(date) + "&pub=" + str(venue) + "&show=100&offset=" + str(self.offset)
+                next_url = 'https://www.sciencedirect.com/search?date=' + str(date) + "&pub=" + str(venue) + "&show=100&offset=0"
                 yield scrapy.Request(
                     url=next_url,
                     callback=self.parse_token,
                 )
-            break
-        break
+        
     
     def parse_token(self, response):
         logging.info('parse_token ' + response.url)
@@ -63,30 +79,25 @@ class SciencedirectSpider(scrapy.Spider):
     def parse_paper_list(self, response):
         logging.info('parse_paper_list ' + response.url)
         results = json.loads(response.text)
-        for paper_item in results['searchResults']:
-            link = paper_item['link']
-            next_url = urllib.parse.urljoin("https://www.sciencedirect.com/", link)
-            yield scrapy.Request(
-                url=next_url,
-                callback=self.parse_read,
-            )
-            break
-        resultsFound = 0
-        for paper_item in scripts:
-            tmpstr = re.search('"resultsFound":"[0-9]*"', paper_item.extract())
-            if tmpstr is not None:
-                tmpstr = tmpstr.group()
-                resultsFound = tmpstr[15:-1]
-                break
-        print('resultsFound', resultsFound)
-        raise NotImplemented
-        # if len(results['searchResults']) > 0:
-        #     self.offset += len(results['searchResults'])
-        #     next_url = re.sub("&offset=.&", "&offset=" + str(self.offset) + "&", response.url)
-        #     yield scrapy.Request(
-        #         url=next_url,
-        #         callback=self.parse_paper_list,
-        #     )
+        if 'searchResults' in results:
+            for paper_item in results['searchResults']:
+                link = paper_item['link']
+                next_url = urllib.parse.urljoin("https://www.sciencedirect.com/", link)
+                yield scrapy.Request(
+                    url=next_url,
+                    callback=self.parse_read,
+                )
+
+        if 'resultsFound' in results:
+            resultsFound = int(results['resultsFound'])
+            offset = int(re.search('offset=[0-9]*', response.url).group()[7:])
+            if resultsFound > offset + 100:
+                offset += 100
+                next_url = re.sub("&offset=[0-9]*", "&offset=" + str(offset), response.url)
+                yield scrapy.Request(
+                    url=next_url,
+                    callback=self.parse_paper_list,
+                )
 
     def parse_read(self, response):
         # f1 = open('test.html', 'w')
@@ -111,7 +122,7 @@ class SciencedirectSpider(scrapy.Spider):
                 month = re.split(' ', tmpstr)[-2]
                 year = re.split(' ', tmpstr)[-1][:-1]
                 break
-        item['month'] = month
+        item['month'] = wordtonumber[month]
         item['year'] = year
         paper_type = ''
         for paper_item in scripts:

@@ -8,6 +8,7 @@ import datetime
 import calendar
 from ..proxy import getProxy
 import traceback
+import pymongo
 
 wordtonumber = {
     'January': '1',
@@ -26,7 +27,7 @@ wordtonumber = {
 }
 
 
-# test_url = 'https://dl.acm.org/doi/10.5555/3463952.3464018'
+test_url = 'https://dl.acm.org/doi/10.5555/3000364.3000370'
 
 class AcmSpider(scrapy.Spider):
     name = 'ACM'
@@ -46,25 +47,34 @@ class AcmSpider(scrapy.Spider):
         self.startPage = 0
         self.pageSize = 20
         self.startTime = get_project_settings().get('START_TIME')
-        self.end_date = [2000, 1, 1]
+        self.end_date = [1970, 1, 1]
         self.url = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&AfterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
         self.proxyUpdateDelay = get_project_settings().get('PROXY_UPDATE_DELAY')
         self.count = 0
-        # self.proxy = getProxy()
+
+        self.client = pymongo.MongoClient(host='127.0.0.1', port=27017, tz_aware=True)
+        self.db = self.client.pc
+        self.docs = self.db.get_collection("Process")
+        self.config = self.docs.find_one({'title': 'ACM'})
+        print(self.config)
 
     def parse(self, response):
-        start_date = get_project_settings().get('ACM_START_DATE')
-        start_date = datetime.datetime.now().replace(start_date[0], start_date[1], start_date[2]) - datetime.timedelta(
-            days=1)
-        year = start_date.year
-        month = start_date.month
-        day = start_date.day
+
+        # yield scrapy.Request(
+        #     url=test_url,
+        #     callback=self.read
+        # )
+        # return
+
+        year = self.config['year']
+        month = self.config['month']
+        day = self.config['day']
         start = 0
-        size = 20
-        year, month, day, start, size = self.state.get("process", [year, month, day, start, size])
+        size = self.config['PageSize']
+        self.size = size
         self.startPage = start
         next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
-        logging.info("——————————————————从{}年{}月{}日第{}页开始爬取——————————————————".format(year, month, day,start))
+        logging.info("——————————————————从{}年{}月{}日第{}页开始爬取——————————————————".format(year, month, day, start))
         yield scrapy.Request(
             url=next_url,
             callback=self.parse_all,
@@ -72,12 +82,7 @@ class AcmSpider(scrapy.Spider):
 
     def parse_all(self, response):
 
-        # yield scrapy.Request(
-        #     url=test_url,
-        #     callback=self.read
-        # )
-        # return
-        print(response.url)
+        logging.info(response.url)
         year, month, day = int(response.url.split('&')[-7].split('=')[1]), int(
             response.url.split('&')[-5].split('=')[1]), int(response.url.split('&')[-3].split('=')[1])
         now = datetime.datetime.now().replace(year, month, day)
@@ -104,54 +109,54 @@ class AcmSpider(scrapy.Spider):
                     #     self.startPage) + '&pageSize=' + str(self.pageSize)
                     next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
                     logging.info("——————————————————翻页——————————————————")
-                    self.state['process'] = [year, month, day, self.startPage, self.pageSize]
                     yield scrapy.Request(
                         url=next_url,
                         callback=self.parse_all,
                     )
+                    self.update_process(year, month, day, self.startPage)
                 else:
                     self.startPage = 0
-                    logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
                     now = now - datetime.timedelta(days=1)
                     year = now.year
                     month = now.month
                     day = now.day
                     if not (year == self.end_date[0] and month == self.end_date[1] and day == self.end_date[2]):
                         next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
-                        self.state['process'] = [year, month, day, self.startPage, self.pageSize]
                         yield scrapy.Request(
                             url=next_url,
                             callback=self.parse_all,
                         )
+                    self.update_process(year, month, day, self.startPage)
+                    logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
             else:
                 self.startPage = 0
-                logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
                 now = now - datetime.timedelta(days=1)
                 year = now.year
                 month = now.month
                 day = now.day
                 if not (year == self.end_date[0] and month == self.end_date[1] and day == self.end_date[2]):
                     next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
-                    self.state['process'] = [year, month, day, self.startPage, self.pageSize]
                     yield scrapy.Request(
                         url=next_url,
                         callback=self.parse_all,
                     )
+                    self.update_process(year, month, day, self.startPage)
+                    logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
         except ValueError:
             logging.info('这网站出错啦,' + response.url)
             self.startPage = 0
-            logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
             now = now - datetime.timedelta(days=1)
             year = now.year
             month = now.month
             day = now.day
             if not (year == self.end_date[0] and month == self.end_date[1] and day == self.end_date[2]):
                 next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
-                self.state['process'] = [year, month, day, self.startPage, self.pageSize]
                 yield scrapy.Request(
                     url=next_url,
                     callback=self.parse_all,
                 )
+                self.update_process(year, month, day, self.startPage)
+                logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
 
     def read(self, response):
         # if self.count % self.proxyUpdateDelay == 0:
@@ -186,11 +191,11 @@ class AcmSpider(scrapy.Spider):
             item['month'] = wordtonumber[[publishx[1]][0]]
             if 'title' in type:
                 item['type'] = 'journal' if 'periodicals' in type_2 or 'journal' in type_2 else 'conference'
-                item['venue'] = full_info[3]
+                item['venue'] = full_info[3].split("'")[0]
 
             else:
                 item['type'] = 'journal' if 'journal' in type else 'conference'
-                item['venue'] = full_info[2]
+                item['venue'] = full_info[2].split("'")[0]
 
             # 数据源
             item['source'] = 'ACM'
@@ -208,16 +213,29 @@ class AcmSpider(scrapy.Spider):
                     style = response.xpath('//stream[@class="cloudflare-stream-player"]/@src').extract()[0]
                     item[
                         'thumbnail_url'] = "https://videodelivery.net/" + style + '/thumbnails/thumbnail.jpg?time=10.0s'
-
-            item['pdf_url'] = ''
-            item['pdf_path'] = ''
+            try:
+                url = response.xpath('//li[@class="pdf-file"]/a/@href').extract()[0]
+                item['pdf_url'] = 'https://dl.acm.org'+ url
+                item['pdf_path'] = './PDF/ACM/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ','_')+'.pdf'
+            except Exception:
+                item['pdf_url'] = ''
+                item['pdf_path'] = ''
             # pdf链接：无
             # 该论文被引用的数量
             item['inCitations'] = response.xpath('//span[@class="citation"]/span/text()')[0].extract()
             ref = response.xpath('//ol[@class="rlist references__list references__numeric"]/li').extract()
             item['outCitations'] = str(len(ref))
-            # print(item)
+            #print(item)
             yield item
         except Exception as e:
             # print(traceback.print_exc())
             logging.info('解析网站内容出错啦,' + response.url)
+
+    def update_process(self, year, month, day, page):
+        process = {
+            'year': year,
+            'month': month,
+            'day': day,
+            'startPage': page
+        }
+        self.docs.update({'title': 'ACM'}, {'$set': process}, True)
