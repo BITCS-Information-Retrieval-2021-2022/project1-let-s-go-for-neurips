@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import datetime
 
-BOT_NAME = 'Reptiles'
+BOT_NAME = 'ACM'
 
 SPIDER_MODULES = ['Reptiles.spiders']
 NEWSPIDER_MODULE = 'Reptiles.spiders'
@@ -33,7 +33,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
 # Proxy Setting
 # RANDOM_UA_TYPE = 'random'  # 或者指定浏览器 firefox、chrome...
-PROXY_LIST = './proxylist_big.txt'
+PROXY_LIST = './Reptiles/configs/proxylist_big.txt'
 # 代理模式
 # 0 = Every requests have different proxy
 # 1 = Take only one proxy from the list and assign it to every requests
@@ -47,7 +47,7 @@ PROXY_MODE = 0
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1.1
+DOWNLOAD_DELAY = 1
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
@@ -61,7 +61,7 @@ DOWNLOADER_MIDDLEWARES = {
     'Reptiles.middlewares.RandomUserAgentMiddleware': 543,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
-
+DOWNLOAD_TIMEOUT = 100
 # DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 # SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 # SCHEDULER_PERSIST = True
@@ -74,7 +74,7 @@ ITEM_PIPELINES = {
     'Reptiles.pipelines.ReptilesPipeline': 100,
     'Reptiles.pipelines.PDFPipeline': 200,
 }
-FILES_STORE = '../PDF/'
-LOG_FILE_PATH = '../Logs/Scrapy_{}_{}_{}.log'.format(START_TIME.year, START_TIME.month, START_TIME.day)
+FILES_STORE = './PDF/'
+LOG_FILE_PATH = './Logs/{}_Scrapy_{}_{}_{}.log'.format(BOT_NAME,START_TIME.year, START_TIME.month, START_TIME.day)
 LOG_LEVEL = 'INFO'
 LOG_FILE = LOG_FILE_PATH

@@ -27,7 +27,7 @@ wordtonumber = {
 }
 
 
-test_url = 'https://dl.acm.org/doi/10.5555/3000364.3000370'
+# test_url = 'https://dl.acm.org/doi/10.1109/ETFA.2019.8869074'
 
 class AcmSpider(scrapy.Spider):
     name = 'ACM'
@@ -48,7 +48,8 @@ class AcmSpider(scrapy.Spider):
         self.pageSize = 20
         self.startTime = get_project_settings().get('START_TIME')
         self.end_date = [1970, 1, 1]
-        self.url = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&AfterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
+        self.url = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&A' \
+                   'fterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
         self.proxyUpdateDelay = get_project_settings().get('PROXY_UPDATE_DELAY')
         self.count = 0
 
@@ -69,7 +70,7 @@ class AcmSpider(scrapy.Spider):
         year = self.config['year']
         month = self.config['month']
         day = self.config['day']
-        start = 0
+        start = max(0, self.config['startPage'] - 2)
         size = self.config['PageSize']
         self.size = size
         self.startPage = start
@@ -81,8 +82,7 @@ class AcmSpider(scrapy.Spider):
         )
 
     def parse_all(self, response):
-
-        logging.info(response.url)
+        # logging.info(response.url)
         year, month, day = int(response.url.split('&')[-7].split('=')[1]), int(
             response.url.split('&')[-5].split('=')[1]), int(response.url.split('&')[-3].split('=')[1])
         now = datetime.datetime.now().replace(year, month, day)
@@ -108,11 +108,11 @@ class AcmSpider(scrapy.Spider):
                     # next_url = self.start_urls[0][:-3] + str(self.ID) + '&startPage=' + str(
                     #     self.startPage) + '&pageSize=' + str(self.pageSize)
                     next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
-                    logging.info("——————————————————翻页——————————————————")
                     yield scrapy.Request(
                         url=next_url,
                         callback=self.parse_all,
                     )
+                    logging.info("——————————{}年{}月{}日第{}页爬取完毕————————".format(year, month, day, self.startPage - 1))
                     self.update_process(year, month, day, self.startPage)
                 else:
                     self.startPage = 0
@@ -215,19 +215,20 @@ class AcmSpider(scrapy.Spider):
                         'thumbnail_url'] = "https://videodelivery.net/" + style + '/thumbnails/thumbnail.jpg?time=10.0s'
             try:
                 url = response.xpath('//li[@class="pdf-file"]/a/@href').extract()[0]
-                item['pdf_url'] = 'https://dl.acm.org'+ url
-                item['pdf_path'] = './PDF/ACM/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ','_')+'.pdf'
+                item['pdf_url'] = 'https://dl.acm.org' + url
+                item['pdf_path'] = './PDF/ACM/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ',
+                                                                                                        '_') + '.pdf'
             except Exception:
                 item['pdf_url'] = ''
                 item['pdf_path'] = ''
             # pdf链接：无
             # 该论文被引用的数量
             item['inCitations'] = response.xpath('//span[@class="citation"]/span/text()')[0].extract()
-            ref = response.xpath('//ol[@class="rlist references__list references__numeric"]/li').extract()
+            ref = response.xpath('//ol[contains(@class,"rlist references__list")]/li').extract()
             item['outCitations'] = str(len(ref))
-            #print(item)
+            # print(item)
             yield item
-        except Exception as e:
+        except Exception:
             # print(traceback.print_exc())
             logging.info('解析网站内容出错啦,' + response.url)
 
