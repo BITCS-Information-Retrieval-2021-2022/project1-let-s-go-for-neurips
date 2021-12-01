@@ -130,8 +130,7 @@ class RandomUserAgentMiddleware(object):
     def process_request(self, request, spider):
         def get_ua():
             return getattr(self.ua, self.ua_type)
-
-        logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
+        #logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
         request.headers.setdefault('User-Agent', get_ua())
 
 
@@ -149,3 +148,35 @@ class JSMiddleware(object):
         body = driver.page_source
         print("访问" + request.url)
         return HtmlResponse(driver.current_url, body=body, encoding='utf-8', request=request)
+
+
+class StatisticsMiddleware(object):
+    def __init__(self, stats):
+        self.stats = stats
+        # 每隔多少秒监控一次已抓取数量
+        self.time = 10.0
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        instance = cls(crawler.stats)
+        crawler.signals.connect(instance.spider_opened, signal=signals.spider_opened)
+        crawler.signals.connect(instance.spider_closed, signal=signals.spider_closed)
+        return instance
+
+    def spider_opened(self):
+        self.tsk = task.LoopingCall(self.collect)
+        self.tsk.start(self.time, now=True)
+
+    def spider_closed(self):
+        scrapy_count = self.stats.get_value('item_scraped_count')
+        print(scrapy_count)
+        if self.tsk.running:
+            self.tsk.stop()
+
+    def collect(self):
+        # 这里收集stats并写入相关的储存。
+        # 目前展示是输出到终端
+        scrapy_count = self.stats.get_value('item_scraped_count')
+        if scrapy_count:
+            print(scrapy_count)
+
