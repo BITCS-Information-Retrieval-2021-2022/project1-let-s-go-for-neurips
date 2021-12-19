@@ -15,17 +15,17 @@
         - [ 1、运行环境](#head13)
         - [ 2、安装依赖](#head14)
         - [ 3、运行](#head15)
-    - [ 第三方库依赖](#head12)
-    - [ 系统架构](#head11)
-        - [ 1、系统总体](#head12)
-        - [ 2、爬虫服务](#head13)
-    - [ 各模块执行原理](#head19)
-        - [ 1、ACM](#head20)
-        - [ 2、Springer](#head26)
-        - [ 3、ScienceDirect](#head29)
-        - [ 4、IP池服务](#head35)
-        - [ 5、数据库](#head49)
-    - [ 代码及文件结构](#head55)
+    - [ 第三方库依赖](#head16)
+    - [ 系统架构](#head17)
+        - [ 1、系统总体](#head18)
+        - [ 2、爬虫服务](#head19)
+    - [ 各模块执行原理](#head20)
+        - [ 1、ACM](#head21)
+        - [ 2、Springer](#head22)
+        - [ 3、ScienceDirect](#head23)
+        - [ 4、IP池服务](#head24)
+        - [ 5、数据库](#head25)
+    - [ 代码及文件结构](#head26)
 # <span id="head1"> Let's Go For NeurIPS</span>
 
 ## <span id="head2"> 项目介绍</span>
@@ -128,24 +128,85 @@ pip install -r requirements.txt
 
 - 执行`scrapy crawl ***`，例如爬取ACM网站则执行`scrapy crawl ACM`
 
-## <span id="head1"> 第三方库依赖</span>
+## <span id="head16"> 第三方库依赖</span>
+参见`./requirements.txt`
+## <span id="head17"> 系统架构</span>
 
-## <span id="head1"> 系统架构</span>
+### <span id="head18"> 1、系统总体</span>
 
-### <span id="head13"> 1、系统总体</span>
+### <span id="head19"> 2、爬虫服务</span>
 
-### <span id="head14"> 2、爬虫服务</span>
+## <span id="head20"> 各模块执行原理</span>
 
-## <span id="head12"> 各模块执行原理</span>
+### <span id="head21"> 1、ACM</span>
 
-### <span id="head13"> 1、ACM</span>
+### <span id="head22"> 2、Springer</span>
 
-### <span id="head14"> 2、Springer</span>
+### <span id="head23"> 3、ScienceDirect</span>
 
-### <span id="head14"> 3、ScienceDirect</span>
+### <span id="head24"> 4、IP池服务</span>
 
-### <span id="head14"> 4、IP池服务</span>
+### <span id="head25"> 5、数据库</span>
+MongoDB是一个基于分布式文件系统的开源数据库系统，数据存储为一个文档，数据结构由键值对组成。文档类似于json对象，字段值可以包含其他文档，数据及文档数组。  
+#### 5.1、执行流程
+对爬取到的每一篇论文根据论文标题计算一个`checksum`值，根据`checksum`判断论文是否已经在数据库中了，如果已在数据库中则对已有数据进行更新，否则执行插入操作。
+#### 5.2、checksum计算规则
+使用正则表达式：
+```python
+checksum = re.sub(r'[\W\d\_]', "", info['title']).lower()
+```
+`checksum`即去除论文标题中除了字母和数字以外的所有字符，并将字母全部取小写。
+#### 5.3、接口定义
+采用`python`中的第三方库`pymongo`与数据库进行交互。  
+具体代码参见`./Reptiles/Reptiles/mongodb.py`。  
+- 连接数据库：
+```python
+Mongo = MongoManager()
+```
+- 插入及更新数据：
+```python
+Mongo.mongodb_insert(site, info)
+```
+- 删除数据：
+```python
+Mongo.mongodb_delete(site, field, value)
+```
+- 查询数据：
+```python
+Mongo.mongodb_find(site, field, value)
+```
 
-### <span id="head14"> 5、数据库</span>
+## <span id="head26"> 代码及文件结构</span>
+- 代码结构
+```
+.
+│  README.md
+│  requirements.txt
+│
+└─Reptiles
+    │  scrapy.cfg
+    │  start.bat
+    │
+    └─Reptiles
+        │  convert_json.py
+        │  items.py
+        │  middlewares.py
+        │  mongodb.py
+        │  pipelines.py
+        │  proxy.py
+        │  settings.py
+        │  __init__.py
+        │
+        ├─configs
+        │      proxylist_big.txt
+        │
+        └─spiders
+                ACM.py
+                ScienceDirect.py
+                Springer.py
+                __init__.py
+```
+- 文件结构
+```
 
-## <span id="head12"> 代码及文件结构</span>
+```
