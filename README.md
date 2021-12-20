@@ -134,13 +134,13 @@ pip install -r requirements.txt
 
 ### <span id="head18"> 总体架构</span>
 
-[总体架构](./extra/structure.png)
+![总体架构](./extra/structure.png)
 
 系统整体基于Scrapy爬虫框架，对Middelware层和Pipeline层进行了重写，分别完成爬取时的身份代理与下载器的配置，在此基础上针对不同网站的爬取规则实现了三种不同的Spiders。系统外围还集成了代理IP池采集模块，数据存储模块与数据可视化模块
 
 ### <span id="head19"> 爬取流程</span>
 
-[爬取流程](./extra/scrapy.png)
+![爬取流程](./extra/scrapy.png)
 
 系统首先输入的爬取网站，读取预定义的爬取约束信息，然后通过中间件从预先爬取的代理IP池中随机选取一个可用IP，使用代理IP下载网站页面，并对页面内容进行解析，根据解析结果提取论文相关信息，并启动下载器对PDF、视频等文件进行下载，将数据分别存储到MongoDB
 与本地磁盘，然后根据预定义的遍历规则与约束条件，对其他页面进行爬取，直到所有任务完成。
