@@ -17,7 +17,7 @@
         - [ 3、运行](#head15)
     - [ 第三方库依赖](#head16)
     - [ 系统架构](#head17)
-        - [ 1、系统总体](#head18)
+        - [ 1、总体架构](#head18)
         - [ 2、爬虫服务](#head19)
     - [ 各模块执行原理](#head20)
         - [ 1、ACM](#head21)
@@ -132,9 +132,18 @@ pip install -r requirements.txt
 参见`./requirements.txt`
 ## <span id="head17"> 系统架构</span>
 
-### <span id="head18"> 1、系统总体</span>
+### <span id="head18"> 总体架构</span>
 
-### <span id="head19"> 2、爬虫服务</span>
+[总体架构](./extra/structure.png)
+
+系统整体基于Scrapy爬虫框架，对Middelware层和Pipeline层进行了重写，分别完成爬取时的身份代理与下载器的配置，在此基础上针对不同网站的爬取规则实现了三种不同的Spiders。系统外围还集成了代理IP池采集模块，数据存储模块与数据可视化模块
+
+### <span id="head19"> 爬取流程</span>
+
+[爬取流程](./extra/scrapy.png)
+
+系统首先输入的爬取网站，读取预定义的爬取约束信息，然后通过中间件从预先爬取的代理IP池中随机选取一个可用IP，使用代理IP下载网站页面，并对页面内容进行解析，根据解析结果提取论文相关信息，并启动下载器对PDF、视频等文件进行下载，将数据分别存储到MongoDB
+与本地磁盘，然后根据预定义的遍历规则与约束条件，对其他页面进行爬取，直到所有任务完成。
 
 ## <span id="head20"> 各模块执行原理</span>
 
@@ -145,6 +154,13 @@ pip install -r requirements.txt
 ### <span id="head23"> 3、ScienceDirect</span>
 
 ### <span id="head24"> 4、IP池服务</span>
+对于ACM、Springer、ScienceDirect网站的反爬限制，采用代理IP的方式，定期爬取和更新代理IP池，在爬取论文是随机更换代理IP。
+
+代理IP池需定期更新，对代理网站的免费代理进行持续采集，保存到proxylist.txt代理IP池本地文件。
+
+**代理源**
+
+- [快代理](www.kuaidaili.com)
 
 ### <span id="head25"> 5、数据库</span>
 MongoDB是一个基于分布式文件系统的开源数据库系统，数据存储为一个文档，数据结构由键值对组成。文档类似于json对象，字段值可以包含其他文档，数据及文档数组。  

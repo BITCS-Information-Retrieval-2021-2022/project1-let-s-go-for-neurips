@@ -40,6 +40,6 @@ class ReptilesItem(scrapy.Item):
     # PDF下载到本地后的文件路径
     pdf_path = scrapy.Field()
     # 该论文被引用的数量
-    inCitations	= scrapy.Field()
+    inCitations = scrapy.Field()
     # 该论文所引用的论文数量
     outCitations = scrapy.Field()
