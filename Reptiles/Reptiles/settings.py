@@ -75,6 +75,6 @@ ITEM_PIPELINES = {
     'Reptiles.pipelines.PDFPipeline': 200,
 }
 FILES_STORE = './PDF/'
-LOG_FILE_PATH = './Logs/{}_Scrapy_{}_{}_{}.log'.format(BOT_NAME,START_TIME.year, START_TIME.month, START_TIME.day)
+LOG_FILE_PATH = './Logs/{}_Scrapy_{}_{}_{}.log'.format(BOT_NAME, START_TIME.year, START_TIME.month, START_TIME.day)
 LOG_LEVEL = 'INFO'
 LOG_FILE = LOG_FILE_PATH

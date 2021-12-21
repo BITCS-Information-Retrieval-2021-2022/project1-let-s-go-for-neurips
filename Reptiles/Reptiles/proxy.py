@@ -23,11 +23,9 @@ class getProxy:
         self.parseHtml(html)
 
     def parseHtml(self, html):
-        lst = []
-        # todo
         parsehtml = etree.HTML(html)
         # print(parsehtml)
-        #time.sleep(1)
+        # time.sleep(1)
         iplist = parsehtml.xpath('//*[@id="list"]/table/tbody/tr/td[1]')
         portlist = parsehtml.xpath('//*[@id="list"]/table/tbody/tr/td[2]')
         iflist = parsehtml.xpath('//*[@id="list"]/table/tbody/tr/td[3]')
@@ -50,7 +48,7 @@ class getProxy:
     def main(self):
         # if os.path.exists(self.path):
         #     os.remove(self.path)
-        for i in range(91,180):
+        for i in range(91, 180):
             print(i)
             self.index = i + 1
             self.getHtml()
@@ -61,10 +59,10 @@ class getProxy:
         with open('proxylist_new.txt', 'a') as f:
             for p in proxy:
                 print(p)
-                f.write('HTTP://'+p)
+                f.write('HTTP://' + p)
 
 
 if __name__ == '__main__':
     proxy = getProxy()
     proxy.main()
-    #proxy.process_proxy()
+    # proxy.process_proxy()
