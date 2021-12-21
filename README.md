@@ -249,7 +249,7 @@ checksum = re.sub(r'[\W\d\_]', "", info['title']).lower()
 `checksum`即去除论文标题中除了字母和数字以外的所有字符，并将字母全部取小写。
 #### 5.3 接口定义
 采用`python`中的第三方库`pymongo`与数据库进行交互。  
-具体代码参见`./Reptiles/Reptiles/mongodb.py`。  
+具体代码参见`./Reptiles/Reptiles/data_manager.py`。  
 - 连接数据库：
 ```python
 Mongo = MongoManager()
@@ -266,7 +266,15 @@ Mongo.mongodb_delete(site, field, value)
 ```python
 Mongo.mongodb_find(site, field, value)
 ```
+### 6.Elasticsearch可视化展示平台
 
+1. 执行流程
+
+   将安装好的elasticsearch与Kibana程序在指定端口启动，爬虫爬取到的item会经过流水线先在mongodb数据库中进行查询，若记录未存在，则通过api插入至Elasticsearch系统中，实现数据的动态增量更新。
+
+2. 数据可视化
+
+   访问Elasticsearch控制台: localhost:5601，并在dashboard中找到数据。
 ## <span id="head26"> 代码及文件结构</span>
 - 代码结构
 ```
