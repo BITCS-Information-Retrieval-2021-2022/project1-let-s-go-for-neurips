@@ -249,6 +249,7 @@ class SpringerSpider(scrapy.Spider):
             item['pdf_url'] = response.xpath('//div[@class="c-pdf-download u-clear-both"]/a/@href')[0].extract()
             item['pdf_path'] = 'Springer/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ', '_') + '.pdf'
         except Exception as e:
+            logging.info(e)
             item['pdf_url'] = ''
             item['pdf_path'] = ''
         # 该论文被引用的数量：无
@@ -258,6 +259,7 @@ class SpringerSpider(scrapy.Spider):
             out = response.xpath('//span[@class="c-article-references__counter"]/text()')[-1].extract()
             item['outCitations'] = re.findall('\\d+', out)[-1]
         except Exception as e:
+            logging.info(e)
             item['outCitations'] = 0
         # print(item)
         yield item
@@ -307,6 +309,7 @@ class SpringerSpider(scrapy.Spider):
             out = response.xpath('//div[@class="CitationNumber"]/text()')[-1].extract()
             item['outCitations'] = re.findall("\\d+", out)[-1]
         except Exception as e:
+            logging.info(e)
             item['outCitations'] = 0
         yield item
 
