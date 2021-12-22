@@ -253,35 +253,6 @@ pip install -r requirements.txt
 ![Springer2](./extra/springer2.png)
 ![Springer3](./extra/springer3.png)
 
-=======
-
-- 根据观察可知，ACM提供了"/dl.acm.org/action/doSearch"接口来提供论文信息查询服务，通过构造请求参数，可以查询到全站论文信息。
-- 上述接口可供填写的请求参数有：
-  - AfterYear/AfterMonth/AfterDay：查询截止年/月/日
-  - BeforeYear/BeforeMonth/BeforeDay ：查询起始年/月/日
-  - concept: 查询文献所属类别
-  - sorted: 查询结果排序依据
-  - startPage：查询结果返回的开始页码
-  - pageSize：一次查询返回的结果数量
-- 由于ACM接口做了防爬取处理，每次查询返回最多2000条数据，本系统按日期对全站数据进行遍历查询
-  - 通过接口"/dl.acm.org/action/doSearch"查询当日出版的某一页论文数据，并通过startPage控制查询进度，解析得到某个文献的具体内容网址
-  - 解析文献具体网址，从中提取基本信息、pdf链接、视频链接
-  - 如果pdf或视频链接存在，则使用下载器进行下载
-
-#### 1.2 网站解析逻辑
-
-每个单独文献的解析如下，使用xpath进行内容提取，部分特殊处理逻辑为：
-
-1. 引用文献数量(inCitations)：获取所有引用文献，并统计列表长度作为引用文献数量
-2. 视频链接(video_url)与封面链接(thumbnail_url)：获取视频播放源地址，并使用"videodelivery.net/" + source +"/thumbnails/thumbnail.jpg?time=10.0s"作为完整地址
-3. 摘要(abstract):部分文献摘要为pdf格式的图片，需做异常判断处理
-4. 视频链接(pdf_url)和视频存放路径(pdf_path):若文献存在视频，则将论文题目去除标点符号并以小写形式作为视频名，保存并下载
-
-![ACM1](./extra/acm1.png)
-![ACM1](./extra/acm2.png)
-### <span id="head22"> 2. Springer</span>
-
->>>>>>> 840e01a202acf1682c1124dfe0dcf6fd48f894ef
 ### <span id="head23"> 3. ScienceDirect</span>
 
 #### 1.1 网站遍历逻辑
