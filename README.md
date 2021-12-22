@@ -39,9 +39,9 @@
 | 王昊    | 3120211035 | ACM网站爬取逻辑，Elasticsearch检索系统，工作整合与对接         |
 | 刘文鼎  | 3120211080 |          |
 | 何鹏    | 3120211035 | ScienceDirect网站爬取逻辑，IP池动态获取 |
-| 王星煜  |3120211055  | 系统框架搭建，代理IP池爬取 |
-| 徐天祥  |3220210891  | Springer网站爬取逻辑 |
-| 杨雪    | 3120211001 | 部分ACM网站爬取逻辑，汇报材料 |
+| 王星煜  |3120211055  |          |
+| 徐天祥  |3220210891  |          |
+| 杨雪    | 3120211001 |          |
 
 
 ## <span id="head4"> 功能特色</span>
@@ -80,11 +80,11 @@
 
   **具体统计**（注：由于增量式爬取，有些论文被多个网站爬取，各网站爬取之和多于数据库记录）
 
-  | 网站名        | 爬取数量 | 下载PDF数量 | 
-  | ------------- | -------- | ----------- | 
-  | ACM           |      |          |  
-  | Springer      |     |        |  
-  | ScienceDirect |    |        |   
+  | 网站名        | 爬取数量 | 下载PDF数量 |
+  | ------------- | -------- | ----------- |
+  | ACM           |      |          |
+  | Springer      |     |        |
+  | ScienceDirect |    |        |
 
   | 字段名          | 数量   | 覆盖率 | 备注                                                         |
   | ------------   | ------ | ------ | ------------------------------------------------------------ |
@@ -104,7 +104,7 @@
   | pdf_url        |  |  |                                                              |
   | pdf_path       |   |   |                                         |
   | inCitations    |    |     |                                                              |
-  | outCitations   |   |  |        
+  | outCitations   |   |  |
 
 ## <span id="head12"> 执行方法</span>
 
@@ -258,7 +258,9 @@ pip install -r requirements.txt
 #### 1.1 网站遍历逻辑
 
 - 由于ScienceDirect页面使用异步加载模式，直接通过网页解析不能获取到任何论文列表，所以通过网页开发者工具截取查询请求，通过分析查询请求的构成，手动拼接查询请求获取论文列表
-    - 返回结果为json格式，解析json格式获取论文列表的链接
+    - 返回结果为json格式，解析json格式获取论文列表中每个论文的链接
+
+![ScienceDirect1](./extra/ScienceDirect1.png)
 
 - 根据网页开发工具拦截可知，ScienceDirect使用了"www.sciencedirect.com/search/api?"接口来进行论文信息查询服务，通过构造请求参数，可以查询到全站论文信息
 - 上述接口可供填写的请求参数有：
@@ -280,12 +282,41 @@ pip install -r requirements.txt
 
 #### 1.2 网站解析逻辑
 
-每个单独文献的解析如下，使用xpath进行内容提取，部分特殊处理逻辑为：
+- 每个单独文献的解析如下，使用xpath进行内容提取
 
-1. 作者名(authors)：需要分开获取given_name和surname，然后进行拼接得到每个作者的姓名
-2. 年份(year)与月份(month)：需要使用正则表达式对整个日期字符串进行处理，得到相应的年份和月份
-3. pdf地址(pdf_url)：网页使用异步加载格式，直接提取不到pdf链接，通过网页开发者工具截取请求，分析请求格式，手动构建
-4. 引用文献数量(inCitations)：网页使用异步加载格式，直接提取不到引用文献数量，所以通过网页开发者工具截取请求，重新构建请求访问获取json文件，包含引用论文数量
+![ScienceDirect2](./extra/ScienceDirect2.png)
+
+部分特殊处理逻辑为：
+
+- 论文标题(title)：直接在源码中meta部分获取论文标题
+
+![ScienceDirect3](./extra/ScienceDirect3.png)
+
+
+
+- 作者列表(authors)：需要分开获取given_name和surname，然后进行拼接得到每个作者的姓名
+
+![ScienceDirect9](./extra/ScienceDirect9.png)
+
+- 年份(year)与月份(month)：在论文主页scripts源码中查找发表时间，找到“Publication date”项，正则表达式分解即可得到年份和月份
+
+![ScienceDirect4](./extra/ScienceDirect4.png)
+
+- 论文类型(type)：在论文主页scripts源码中查找论文类型，找到“publicationType”项，即为论文类型
+
+![ScienceDirect5](./extra/ScienceDirect5.png)
+
+- 该论文所引用的论文数量(outCitations)：在论文主页scripts源码中查找该论文所引用的论文数量，找到“document-references”项，即为该论文所引用的论文数量
+
+![ScienceDirect7](./extra/ScienceDirect7.png)
+
+- 该论文被引用的数量(inCitations)：网页使用异步加载格式，直接提取不到该论文被引用的数量，通过网页开发者工具截取请求，分析请求格式，手动构建请求，返回json中得到“hitCount”，即为该论文被引用的数量
+
+![ScienceDirect8](./extra/ScienceDirect8.png)
+
+- pdf地址(pdf_url)：网页使用异步加载格式，直接提取不到pdf链接，通过在scripts源码中查找"md5"和"pid"项，拼接得到正确的pdf地址
+
+![ScienceDirect10](./extra/ScienceDirect10.png)
 
 
 
