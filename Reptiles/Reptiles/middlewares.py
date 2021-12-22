@@ -130,7 +130,7 @@ class RandomUserAgentMiddleware(object):
     def process_request(self, request, spider):
         def get_ua():
             return getattr(self.ua, self.ua_type)
-        # logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
+        #logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
         request.headers.setdefault('User-Agent', get_ua())
 
 
@@ -164,7 +164,7 @@ class StatisticsMiddleware(object):
         return instance
 
     def spider_opened(self):
-        self.tsk = self.task.LoopingCall(self.collect)
+        self.tsk = task.LoopingCall(self.collect)
         self.tsk.start(self.time, now=True)
 
     def spider_closed(self):
@@ -179,3 +179,4 @@ class StatisticsMiddleware(object):
         scrapy_count = self.stats.get_value('item_scraped_count')
         if scrapy_count:
             print(scrapy_count)
+

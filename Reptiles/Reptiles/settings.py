@@ -23,7 +23,8 @@ ROBOTSTXT_OBEY = False
 START_TIME = datetime.datetime.now()
 PROXY_UPDATE_DELAY = 150
 # URL
-ACM_URL = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&AfterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
+ACM_URL = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&AfterYear={' \
+          '}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
 ACM_START_DATE = [2020, 10, 30]
 # Retry Setting
 # Retry many times since proxies often fail

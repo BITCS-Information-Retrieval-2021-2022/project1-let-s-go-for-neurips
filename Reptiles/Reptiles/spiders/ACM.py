@@ -25,30 +25,25 @@ wordtonumber = {
     'December': '12',
 
 }
+tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
 
-
-# test_url = 'https://dl.acm.org/doi/10.1109/ETFA.2019.8869074'
 
 class AcmSpider(scrapy.Spider):
     name = 'ACM'
     allowed_domains = ['dl.acm.org']
-    start_date = get_project_settings().get('ACM_START_DATE')
-    start_date = datetime.datetime.now().replace(start_date[0], start_date[1], start_date[2]) - datetime.timedelta(
-        days=1)
-    start_urls = [get_project_settings().get('ACM_URL').format(start_date.year,
-                                                               start_date.year,
-                                                               start_date.month,
-                                                               start_date.month,
-                                                               start_date.day, start_date.day,
+    start_urls = [get_project_settings().get('ACM_URL').format(tomorrow.year,
+                                                               tomorrow.year,
+                                                               tomorrow.month,
+                                                               tomorrow.month,
+                                                               tomorrow.day, tomorrow.day,
                                                                0, 20)]
 
     def __init__(self):
         super(AcmSpider, self).__init__()
         self.startPage = 0
         self.pageSize = 20
-        self.startTime = get_project_settings().get('START_TIME')
-        self.end_date = [1970, 1, 1]
-        self.url = 'https://dl.acm.org/action/doSearch?expand=all&field1=AllField&A' \
+        self.end_date = [tomorrow.year, tomorrow.month, tomorrow.day]
+        self.url = 'https://dl.acm.org/action/doSearch?sortBy=cited&expand=all&field1=AllField&A' \
                    'fterYear={}&BeforeYear={}&AfterMonth={}&BeforeMonth={}&AfterDay={}&BeforeDay={}&startPage={}&pageSize={}'
         self.proxyUpdateDelay = get_project_settings().get('PROXY_UPDATE_DELAY')
         self.count = 0
@@ -60,12 +55,6 @@ class AcmSpider(scrapy.Spider):
         print(self.config)
 
     def parse(self, response):
-
-        # yield scrapy.Request(
-        #     url=test_url,
-        #     callback=self.read
-        # )
-        # return
 
         year = self.config['year']
         month = self.config['month']
@@ -105,8 +94,6 @@ class AcmSpider(scrapy.Spider):
 
                 if (self.startPage + 1) * self.pageSize < int(results_num) and self.startPage <= 100:
                     self.startPage += 1
-                    # next_url = self.start_urls[0][:-3] + str(self.ID) + '&startPage=' + str(
-                    #     self.startPage) + '&pageSize=' + str(self.pageSize)
                     next_url = self.url.format(year, year, month, month, day, day, self.startPage, self.pageSize)
                     yield scrapy.Request(
                         url=next_url,
@@ -116,7 +103,7 @@ class AcmSpider(scrapy.Spider):
                     self.update_process(year, month, day, self.startPage)
                 else:
                     self.startPage = 0
-                    now = now - datetime.timedelta(days=1)
+                    now = now + datetime.timedelta(days=1)
                     year = now.year
                     month = now.month
                     day = now.day
@@ -127,10 +114,10 @@ class AcmSpider(scrapy.Spider):
                             callback=self.parse_all,
                         )
                     self.update_process(year, month, day, self.startPage)
-                    logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
+                    logging.info("————————————{}年{}月{}日开始爬取——————————".format(year, month, day))
             else:
                 self.startPage = 0
-                now = now - datetime.timedelta(days=1)
+                now = now + datetime.timedelta(days=1)
                 year = now.year
                 month = now.month
                 day = now.day
@@ -141,11 +128,11 @@ class AcmSpider(scrapy.Spider):
                         callback=self.parse_all,
                     )
                     self.update_process(year, month, day, self.startPage)
-                    logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
+                    logging.info("————————————{}年{}月{}日开始爬取——————————".format(year, month, day))
         except ValueError:
             logging.info('这网站出错啦,' + response.url)
             self.startPage = 0
-            now = now - datetime.timedelta(days=1)
+            now = now + datetime.timedelta(days=1)
             year = now.year
             month = now.month
             day = now.day
@@ -156,7 +143,7 @@ class AcmSpider(scrapy.Spider):
                     callback=self.parse_all,
                 )
                 self.update_process(year, month, day, self.startPage)
-                logging.info("————————————{}年{}月{}日爬取完毕——————————".format(year, month, day))
+                logging.info("————————————{}年{}月{}日开始爬取——————————".format(year, month, day))
 
     def read(self, response):
         # if self.count % self.proxyUpdateDelay == 0:
@@ -201,6 +188,7 @@ class AcmSpider(scrapy.Spider):
             item['source'] = 'ACM'
             # 视频链接
             item['video_url'] = ''
+            item['video_path'] = ''
             item['thumbnail_url'] = ''
             video_url = response.xpath('//div[@class="video__links table__cell-view"]/a/@href').extract()
 
@@ -213,6 +201,8 @@ class AcmSpider(scrapy.Spider):
                     style = response.xpath('//stream[@class="cloudflare-stream-player"]/@src').extract()[0]
                     item[
                         'thumbnail_url'] = "https://videodelivery.net/" + style + '/thumbnails/thumbnail.jpg?time=10.0s'
+                    item['video_path'] = './VIDEO/ACM/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ',
+                                                                                                                '_') + '.mp4'
             try:
                 url = response.xpath('//li[@class="pdf-file"]/a/@href').extract()[0]
                 item['pdf_url'] = 'https://dl.acm.org' + url
