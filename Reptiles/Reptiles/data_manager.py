@@ -6,6 +6,7 @@ import ndjson
 
 import json
 
+
 def convert_json():
     docs = []
 
@@ -14,7 +15,6 @@ def convert_json():
             docs.append(json.loads(line))
     for dic in docs:
         del dic['_id']
-
 
     with open("./test_out.json", "w") as dump_f:
         for dic in docs:
@@ -39,12 +39,23 @@ class ElasticsearchManager:
     def batch_inset(self, path):
         with open(path, 'r') as load_f:
             load_dict = ndjson.load(load_f)
+            print(len(load_dict))
             for index, item in enumerate(load_dict):
-                print(index)
+                if index % 10000 == 0:
+                    print(index)
                 video_path = ''
                 if item['source'] == 'ACM' and item['video_url'] != '':
                     video_path = './VIDEO/ACM/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ',
                                                                                                         '_') + '.mp4'
+                if item['inCitations'] == "":
+                    item['inCitations'] = 0
+
+                if item['outCitations'] == "":
+                    item['outCitations'] = 0
+                if item['year'] == "":
+                    item['year'] = 0
+                if item['month'] =="":
+                    item['month'] = 0
                 new_item = {
                     "title": item['title'],
                     "abstract": item['abstract'],
@@ -108,7 +119,7 @@ class MongoManager:
 
 if __name__ == '__main__':
     ela = ElasticsearchManager()
-    #ela.batch_inset('/home/liuchi/wh/bit/project1-let-s-go-for-neurips/Paper.json')
+    ela.batch_inset('/home/liuchi/wh/bit/project1-let-s-go-for-neurips/paper_new.json')
     # ela.elas_insert({
     #     'title':'ACM',
     #     'year': 2021,
@@ -117,7 +128,7 @@ if __name__ == '__main__':
     #     'time':datetime.datetime.now()
     # })
     # ela.elas_query()
-    ela.elas_delete('paper')
+    #ela.elas_delete('paper')
     # ela.elas_delete('test')
     # db = MongoManager()
     # db.mongodb_insert("Process", {

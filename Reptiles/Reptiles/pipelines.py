@@ -54,15 +54,11 @@ class PDFPipeline(FilesPipeline):
 
 class VideoPipeline(FilesPipeline):
     def get_media_requests(self, item, info):
-        yield scrapy.Request(item["video_url"], meta={"path": item["video_path"]})
+        if item['video_url'] != "" and item['video_path'] != "":
+            yield scrapy.Request(item["video_url"], meta={"path": item["video_path"]})
 
     def file_path(self, request, response=None, info=None):
         return request.meta.get("path")
 
 
-class VideoPipeline(FilesPipeline):
-    def get_media_requests(self, item, info):
-        yield scrapy.Request(item["video_url"], meta={"path": item["video_path"]})
 
-    def file_path(self, request, response=None, info=None):
-        return request.meta.get("path")

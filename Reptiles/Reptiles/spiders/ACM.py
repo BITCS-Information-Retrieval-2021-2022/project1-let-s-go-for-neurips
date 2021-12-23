@@ -213,7 +213,7 @@ class AcmSpider(scrapy.Spider):
                 item['pdf_path'] = ''
             # pdf链接：无
             # 该论文被引用的数量
-            item['inCitations'] = response.xpath('//span[@class="citation"]/span/text()')[0].extract()
+            item['inCitations'] = response.xpath('//span[@class="citation"]/span/text()')[0].extract().replace(',','')
             ref = response.xpath('//ol[contains(@class,"rlist references__list")]/li').extract()
             item['outCitations'] = str(len(ref))
             # print(item)
