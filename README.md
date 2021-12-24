@@ -15,6 +15,9 @@
         - [ 1.运行环境](#head13)
         - [ 2.安装依赖](#head14)
         - [ 3.安装可视化组件](#head30)
+          - [ 3.1 ElasticSearch](#head31)
+          - [ 3.2 MongoDB](#head32)
+          - [ 3.3 Kibana](#head33)
         - [ 4.运行](#head15)
     - [ 第三方库依赖](#head16)
     - [ 系统架构](#head17)
@@ -124,7 +127,7 @@ pip install -r requirements.txt
 
 ### <span id="head30"> 3.安装可视化组件</span>
 
-#### 3.1 安装ElasticSearch
+#### <span id="head31"> 3.1 ElasticSearch</span>
 
 1. 下载ElasticSearch
 
@@ -146,7 +149,7 @@ pip install -r requirements.txt
    ```curl 'localhost:9200'```
     若有欢迎信息提示，则代表安装成功
 
-#### 3.2 安装MongoDB 
+#### <span id="head32">3.2 MongoDB </span>
 1. 安装依赖
 
 在Linux平台安装前需要先安装各个Linux平台依赖包，Ubuntu系统下执行：
@@ -221,7 +224,7 @@ cd /usr/local/mongodb/
 ```
 如果出现欢迎信息，则说明连接成功。
 
-#### 3.3 Kibana 
+#### <span id="head33">3.3 Kibana </span>
 
 1. 下载Kibana
 
