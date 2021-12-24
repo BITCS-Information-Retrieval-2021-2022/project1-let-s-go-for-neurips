@@ -18,6 +18,7 @@
           - [ 3.1 ElasticSearch](#head31)
           - [ 3.2 MongoDB](#head32)
           - [ 3.3 Kibana](#head33)
+          - [ 3.4 ProxyPool](#head34)
         - [ 4.运行](#head15)
     - [ 第三方库依赖](#head16)
     - [ 系统架构](#head17)
@@ -125,7 +126,7 @@ pip install -r requirements.txt
 ```
 
 
-### <span id="head30"> 3.安装可视化组件</span>
+### <span id="head30"> 3.安装组件</span>
 
 #### <span id="head31"> 3.1 ElasticSearch</span>
 
@@ -244,6 +245,56 @@ cd /usr/local/mongodb/
    
     访问'localhost:5601"，若看到控制台页面，则证明安装成功
 
+#### <span id="head34">3.4 ProxyPool </span>
+
+1. 下载ProxyPool
+    ```
+    git clone https://github.com/Python3WebSpider/ProxyPool.git
+    cd ProxyPool
+    ```
+
+2. 安装依赖包
+    ``` pip3 install -r requirements.txt ```
+
+3. 安装和配置 Redis
+    ```
+    export REDIS_HOST='localhost'
+    export REDIS_PORT=6379
+    export REDIS_PASSWORD=''
+    export REDIS_DB=0
+    ```
+
+4. 运行代理池
+    ``` python3 run.py```
+
+
+5. 使用
+    成功运行之后可以通过 http://localhost:5555/random 获取一个随机可用代理
+    ```
+    class ProxiesMiddleware(object):
+      def __init__(self, settings):
+          super(ProxiesMiddleware, self).__init__()
+          self.step = 0
+          self.proxypool_url = 'http://127.0.0.1:5555/random'
+          self.proxy = self.get_random_proxy()
+
+      @classmethod
+      def from_crawler(cls, crawler):
+          return cls(crawler.settings)
+
+      def get_random_proxy(self):
+          proxy = requests.get(self.proxypool_url).text.strip()
+          logging.info('---get_random_proxy--- ' + str(proxy))
+          return proxy
+
+      def process_request(self, request, spider):
+          self.step += 1
+          if self.step % 1000 == 0:
+              self.proxy = self.get_random_proxy()
+          request.meta['proxy'] = 'http://' + self.proxy
+          request.headers["Connection"] = "close"
+    ```
+
 ### <span id="head15"> 4.运行</span>
 
 - 将仓库克隆至本地
@@ -347,7 +398,7 @@ cd /usr/local/mongodb/
 
 ![sciencedirect1](./extra/sciencedirect1.png)
 
-- 根据网页开发工具拦截可知，ScienceDirect使用了"www.sciencedirect.com/search/api?"接口来进行论文信息查询服务，通过构造请求参数，可以查询到全站论文信息
+- 根据网页开发工具拦截可知，ScienceDirect使用了"www.sciencedirect.com/search/api?" 接口来进行论文信息查询服务，通过构造请求参数，可以查询到全站论文信息
 - 上述接口可供填写的请求参数有：
 
   - date：查询年份
@@ -362,7 +413,7 @@ cd /usr/local/mongodb/
 
 - 由于ScienceDirect查询接口每次最多返回6000条数据，按日期来讲一年有远超过6000条数据，本系统按年份和期刊号的交叉对全站数据进行遍历查询
 
-  - 通过接口"www.sciencedirect.com/search/api?"依次构建date、cid等的字段，查询某一年某一期刊的论文列表，并通过offset控制查询进度，
+  - 通过接口"www.sciencedirect.com/search/api?" 依次构建date、cid等的字段，查询某一年某一期刊的论文列表，并通过offset控制查询进度，
   - 解析json格式，找到其中包含的论文信息，在'searchResults'键下，找到每个论文主页的链接，依次构建请求访问论文主页
 
 #### 3.2 网站解析逻辑
