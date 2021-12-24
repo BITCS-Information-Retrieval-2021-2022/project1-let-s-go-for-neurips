@@ -26,7 +26,11 @@ def prepare_mongodb():
         'page': 1
     })
 
-    # TODO ScienceDirect
+    db.mongodb_insert("Process", {
+        'title': 'ScienceDirect',
+        'year': '2000',
+        'venue_id': 0
+    })
 
 
 if __name__ == '__main__':
