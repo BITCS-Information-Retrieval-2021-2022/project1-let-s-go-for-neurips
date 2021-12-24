@@ -5,9 +5,6 @@ import json
 import logging
 import re
 import pymongo
-# import os
-# os.environ["http_proxy"] = "http://127.0.0.1:7890"
-# os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 wordtonumber = {
     'January': '1',
@@ -22,7 +19,6 @@ wordtonumber = {
     'October': '10',
     'November': '11',
     'December': '12',
-
 }
 
 
