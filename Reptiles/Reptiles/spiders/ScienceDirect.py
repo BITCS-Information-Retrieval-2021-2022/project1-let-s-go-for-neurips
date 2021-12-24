@@ -213,17 +213,7 @@ class SciencedirectSpider(scrapy.Spider):
                 outCitations = str(tmpstr[22:])
                 break
         item['outCitations'] = outCitations
-        pdf_url = ''
-        for paper_item in scripts:
-            tmpstr = re.search('"md5":"[a-zA-Z0-9]*"', paper_item.extract())
-            if tmpstr is not None:
-                md5 = tmpstr.group()[7:-1]
-                tmpstr = re.search(
-                    '"pid":"([a-zA-Z0-9]|\\-|\\.)*.pdf"', paper_item.extract())
-                pid = tmpstr.group()[7:-1]
-                pdf_url = response.url + '/pdf?md5=' + md5 + '&pid=' + pid
-                break
-        item['pdf_url'] = pdf_url
+        item['pdf_url'] = item['url'] + '/pdfft'
         # item['pdf_path'] = './PDF/ScienceDirect/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ','_')+'.pdf'
         item['pdf_path'] = ''
         pii = re.split('/', response.url)[-1]
