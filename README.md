@@ -4,28 +4,29 @@
     - [ 项目介绍](#head2)
     - [ 小组分工](#head3)
     - [ 功能特色](#head4)
-        - [ 1、爬取数据自动去重](#head5)
-        - [ 2、IP池、线程池爬取](#head6)
-        - [ 3、增量爬取](#head7)
-        - [ 4、异常处理](#head8)
-        - [ 5、断点续爬](#head9)
-        - [ 6、日志技术](#head10)
+        - [ 1.爬取数据自动去重](#head5)
+        - [ 2.IP池、线程池爬取](#head6)
+        - [ 3.增量爬取](#head7)
+        - [ 4.异常处理](#head8)
+        - [ 5.断点续爬](#head9)
+        - [ 6.日志技术](#head10)
     - [ 整体效果](#head11)
     - [ 执行方法](#head12)
-        - [ 1、运行环境](#head13)
-        - [ 2、安装依赖](#head14)
-        - [ 3、运行](#head15)
+        - [ 1.运行环境](#head13)
+        - [ 2.安装依赖](#head14)
+        - [ 3.安装可视化组件](#head15)
+        - [ 4.运行](#head15)
     - [ 第三方库依赖](#head16)
     - [ 系统架构](#head17)
-        - [ 1、总体架构](#head18)
-        - [ 2、爬虫服务](#head19)
+        - [ 1.总体架构](#head18)
+        - [ 2.爬虫服务](#head19)
     - [ 各模块执行原理](#head20)
-        - [ 1、ACM](#head21)
-        - [ 2、Springer](#head22)
-        - [ 3、ScienceDirect](#head23)
-        - [ 4、IP池服务](#head24)
-        - [ 5、数据库](#head25)
-        - [ 6、Elasticsearch可视化展示平台](#head26)
+        - [ 1.ACM](#head21)
+        - [ 2.Springer](#head22)
+        - [ 3.ScienceDirect](#head23)
+        - [ 4.IP池服务](#head24)
+        - [ 5.数据库](#head25)
+        - [ 6.Elasticsearch可视化展示平台](#head26)
     - [ 代码结构](#head27)
 # <span id="head1"> Let's Go For NeurIPS</span>
 
@@ -123,7 +124,7 @@ pip install -r requirements.txt
 
 ### <span> 3.安装可视化组件</span>
 
-#### <span> 3.1 安装ElasticSearch </span>
+#### 3.1 安装ElasticSearch
 
 1. 下载ElasticSearch
 
@@ -144,8 +145,83 @@ pip install -r requirements.txt
    运行
    ```curl 'localhost:9200'```
     若有欢迎信息提示，则代表安装成功
-   
-#### <span> 3.2 Kibana </span>
+
+#### 3.2 安装MongoDB 
+1. 安装依赖
+
+在Linux平台安装前需要先安装各个Linux平台依赖包，Ubuntu系统下执行：
+
+```
+sudo apt-get install libcurl4 openssl
+```
+
+2. 下载解压安装
+
+可以从MongoDB官网下载安装包，下载地址：https://www.mongodb.com/download-center/community
+
+![MongoDB安装](./extra/DownloadMongoDB.png)
+
+选择tgz下载，并解压安装包：
+
+```
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-5.0.5.tgz    # 下载
+tar -zxvf mongodb-linux-x86_64-ubuntu1804-5.0.5.tgz                                # 解压
+```
+
+将解压后的文件移动到指定目录：
+
+```
+mv mongodb-src-r5.0.5  /usr/local/mongodb                         # 将解压包拷贝到指定目录
+```
+
+MongoDB 的可执行文件位于 bin 目录下，所以可以将其添加到 PATH 路径中:
+```
+export PATH=/usr/local/mongodb/bin:$PATH
+```
+
+3. 启动MongoDB
+
+MongoDB启动时需要指定将数据和日志文件存储在特定的目录下，创建这两个目录：
+
+```
+sudo mkdir -p /var/lib/mongo           # 创建数据存储目录
+sudo mkdir -p /var/log/mongodb         # 创建日志文件目录
+sudo chown `whoami` /var/lib/mongo     # 设置权限
+sudo chown `whoami` /var/log/mongodb   # 设置权限
+```
+
+由于启动时需要指定很多参数，可以用`.conf`文件的形式将启动时的参数都指定好，创建`mongodb.conf`文件，并在文件中指定以下参数：
+
+```
+# 数据文件存放目录
+dbpath=/var/lib/mongo
+# 日志文件存放目录
+logpath=/var/log/mongodb/mongod.log
+# 以追加的方式记录日志
+logappend=true
+# 默认端口为27017
+port=27017
+# 对访问IP不做限制
+bind_ip=0.0.0.0
+# 以守护进程方式启用
+fork=true
+```
+
+启动MongoDB：
+```
+cd /usr/local/mongodb/
+./bin/mongod -f ./bin/mongodb.conf
+```
+
+5. 测试连接
+
+运行
+```
+./bin/mongo
+```
+如果出现欢迎信息，则说明连接成功。
+
+#### 3.3 Kibana 
 
 1. 下载Kibana
 
