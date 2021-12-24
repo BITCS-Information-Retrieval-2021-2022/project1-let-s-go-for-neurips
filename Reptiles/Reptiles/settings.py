@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import datetime
 
-BOT_NAME = 'ACM'
+BOT_NAME = 'Reptiles'
 
 SPIDER_MODULES = ['Reptiles.spiders']
 NEWSPIDER_MODULE = 'Reptiles.spiders'

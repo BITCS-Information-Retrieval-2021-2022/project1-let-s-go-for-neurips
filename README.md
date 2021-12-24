@@ -175,8 +175,8 @@ pip install -r requirements.txt
 
 - 更改脚本权限 ```chmod +x run.sh```
 
-- 运行脚本 ``./run.sh ACM``
-其中 
+- 运行脚本 ```./run.sh ACM```
+其中ACM可替换为其他爬取源，包括Springer,ScienceDirect.爬虫运行日志位于Logs文件内
 
 ## <span id="head16"> 第三方库依赖</span>
 参见`./requirements.txt`
@@ -206,7 +206,6 @@ pip install -r requirements.txt
 ### <span id="head21"> 1、ACM</span>
 
 #### 1.1 网站遍历逻辑
-<<<<<<< HEAD
 
 - 根据观察可知，ACM提供了"/dl.acm.org/action/doSearch"接口来提供论文信息查询服务，通过构造请求参数，可以查询到全站论文信息。
 - 上述接口可供填写的请求参数有：
@@ -371,7 +370,9 @@ Mongo.mongodb_find(site, field, value)
 
 2. 数据可视化
 
-   访问Elasticsearch控制台: localhost:5601，并在dashboard中找到数据。
+    访问Elasticsearch控制台localhost:5601，并在dashboard中找到数据，可根据提供api自定义可视化控件。
+![elastic](./extra/elastic.jpg)
+
 ## <span id="head27"> 代码结构</span>
 - 代码结构
 ```
