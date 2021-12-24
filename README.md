@@ -265,33 +265,17 @@ cd /usr/local/mongodb/
     export REDIS_DB=0
     ```
 
-4. 运行代理池
+4. 启动 Rdies
+  
+    ``` ./redis-server ```
+
+5. 运行代理池
 
     ``` python3 run.py```
 
 
 5. 使用
     成功运行之后可以通过 http://localhost:5555/random 获取一个随机可用代理
-    ```
-    class ProxiesMiddleware(object):
-      def __init__(self, settings):
-          super(ProxiesMiddleware, self).__init__()
-          self.proxypool_url = 'http://127.0.0.1:5555/random'
-          self.proxy = self.get_random_proxy()
-
-      @classmethod
-      def from_crawler(cls, crawler):
-          return cls(crawler.settings)
-
-      def get_random_proxy(self):
-          proxy = requests.get(self.proxypool_url).text.strip()
-          return proxy
-
-      def process_request(self, request, spider):
-          self.proxy = self.get_random_proxy()
-          request.meta['proxy'] = 'http://' + self.proxy
-          request.headers["Connection"] = "close"
-    ```
 
 ### <span id="head15"> 4.运行</span>
 
@@ -448,18 +432,37 @@ cd /usr/local/mongodb/
 
 ![sciencedirect8](./extra/sciencedirect8.png)
 
-- pdf地址(pdf_url)：网页使用异步加载格式，直接提取不到pdf链接，通过在scripts源码中查找"md5"和"pid"项，拼接得到正确的pdf地址
-
-![sciencedirect10](./extra/sciencedirect10.png)
-
-
 
 ### <span id="head24"> 4. IP池服务</span>
-对于ACM、Springer、ScienceDirect网站的反爬限制，采用动态代理IP的方式，使用ProxyPool开源GitHub项目，实时从众多代理源网站爬取IP，存放在redis数据库中，并实时更新，定期从redis数据库中取出IP，使用这些定期更换的IP来访问网站。
+- 对于ACM、Springer、ScienceDirect网站的反爬限制，采用动态代理IP的方式，使用开源GitHub项目ProxyPool https://github.com/Python3WebSpider/ProxyPool
+- 从众多代理源网站爬取IP，存放在redis数据库中，并实时更新，定期从redis数据库中取出新的IP，使用这些IP来访问网站。
+- 新建ProxiesMiddleware中间件，用于更新强求的代理。
 
-**ProxyPool**
 
-- https://github.com/Python3WebSpider/ProxyPool
+  ```
+    class ProxiesMiddleware(object):
+      def __init__(self, settings):
+          super(ProxiesMiddleware, self).__init__()
+          self.step = 0
+          self.proxypool_url = 'http://127.0.0.1:5555/random'
+          self.proxy = self.get_random_proxy()
+
+      @classmethod
+      def from_crawler(cls, crawler):
+          return cls(crawler.settings)
+
+      def get_random_proxy(self):
+          proxy = requests.get(self.proxypool_url).text.strip()
+          logging.info('---get_random_proxy--- ' + str(proxy))
+          return proxy
+
+      def process_request(self, request, spider):
+          self.step += 1
+          if self.step % 1000 == 0:
+              self.proxy = self.get_random_proxy()
+          request.meta['proxy'] = 'http://' + self.proxy
+          request.headers["Connection"] = "close"
+  ```
 
 ### <span id="head25"> 5. 数据库</span>
 MongoDB是一个基于分布式文件系统的开源数据库系统，数据存储为一个文档，数据结构由键值对组成。文档类似于json对象，字段值可以包含其他文档，数据及文档数组。  
