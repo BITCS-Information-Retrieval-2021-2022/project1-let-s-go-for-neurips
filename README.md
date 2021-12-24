@@ -14,7 +14,7 @@
     - [ 执行方法](#head12)
         - [ 1.运行环境](#head13)
         - [ 2.安装依赖](#head14)
-        - [ 3.安装可视化组件](#head15)
+        - [ 3.安装可视化组件](#head30)
         - [ 4.运行](#head15)
     - [ 第三方库依赖](#head16)
     - [ 系统架构](#head17)
@@ -122,7 +122,7 @@ pip install -r requirements.txt
 ```
 
 
-### <span> 3.安装可视化组件</span>
+### <span id="head30"> 3.安装可视化组件</span>
 
 #### 3.1 安装ElasticSearch
 
