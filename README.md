@@ -5,9 +5,9 @@
     - [ 小组分工](#head3)
     - [ 功能特色](#head4)
         - [ 1、爬取数据自动去重](#head5)
-        - [ 2、IP池爬取](#head6)
-        - [ 3、线程池爬取](#head7)
-        - [ 4、增量爬取](#head8)
+        - [ 2、IP池、线程池爬取](#head6)
+        - [ 3、增量爬取](#head7)
+        - [ 4、异常处理](#head8)
         - [ 5、断点续爬](#head9)
         - [ 6、日志技术](#head10)
     - [ 整体效果](#head11)
@@ -25,7 +25,8 @@
         - [ 3、ScienceDirect](#head23)
         - [ 4、IP池服务](#head24)
         - [ 5、数据库](#head25)
-    - [ 代码及文件结构](#head26)
+        - [ 6、Elasticsearch可视化展示平台](#head26)
+    - [ 代码结构](#head27)
 # <span id="head1"> Let's Go For NeurIPS</span>
 
 ## <span id="head2"> 项目介绍</span>
@@ -37,7 +38,7 @@
 | 姓名                                    | 学号       | 分工                           |
 | --------------------------------------- | ---------- | ------------------------------ |
 | 王昊    | 3120211035 | ACM网站爬取逻辑，Elasticsearch检索系统，工作整合与对接         |
-| 刘文鼎  | 3120211080 |          |
+| 刘文鼎  | 3120211080 | MongoDB数据库搭建及接口实现，数据库相关功能实现        |
 | 何鹏    | 3120211035 | ScienceDirect网站爬取逻辑，IP池动态获取 |
 | 王星煜  |3120211055  |          |
 | 徐天祥  |3220210891  |          |
@@ -54,11 +55,11 @@
 
 - 部署了一个代理IP池，爬虫爬取时从IP池中获得一个随机可用的IP，支持多线程爬取数据，增加爬虫的健壮性
 
-#### <span id="head8"> 3、增量爬取</span>
+#### <span id="head7">3、增量爬取</span>
 
 - 支持增量式爬取，定时更新
 
-#### 4、异常处理
+#### <span id="head8">4、异常处理</span>
 
 - 使用try-catch逻辑块进行异常处理，不再担心爬虫意外退出
 
@@ -72,39 +73,38 @@
 
 ## <span id="head11"> 整体效果</span>
 
-- 数据库中共有记录***条
+- 数据库中共有记录1290137条
 
 - 下载PDF共***篇
 
-- 下载视频共***个
 
   **具体统计**（注：由于增量式爬取，有些论文被多个网站爬取，各网站爬取之和多于数据库记录）
 
   | 网站名        | 爬取数量 | 下载PDF数量 |
   | ------------- | -------- | ----------- |
-  | ACM           |      |          |
-  | Springer      |     |        |
-  | ScienceDirect |    |        |
+  | ACM           |   1015174   |   197884       |
+  | Springer      |  196789   |        |
+  | ScienceDirect |  78174  |    0    |
 
-  | 字段名          | 数量   | 覆盖率 | 备注                                                         |
-  | ------------   | ------ | ------ | ------------------------------------------------------------ |
-  | title          |  |   |                                                              |
-  | abstract       |   |    |                                                              |
-  | authors        |  |    |                                                              |
-  | doi            |  |   |                                                              |
-  | url            |  |   |  |
-  | year           |   |   |                                          |
-  | month          |  |   |                                                              |
-  | type           |  |   |                                                              |
-  | venue          |  |   |                                                              |
-  | source         |  |  |                                                              |
-  | video_url      |   |    |                                         |
-  | video_path     |    |    |                                                              |
-  | thumbnail_url  |   |  |                                                              |
-  | pdf_url        |  |  |                                                              |
-  | pdf_path       |   |   |                                         |
-  | inCitations    |    |     |                                                              |
-  | outCitations   |   |  |
+  | 字段名          | 数量   | 覆盖率 | 
+  | ------------   | ------ | ------ |
+  | title          | 1290137 |  100.00% |
+  | abstract       |  1217294 |  94.35%  |                                                              
+  | authors        | 1290137 |  100.00%  |                                                              
+  | doi            | 1069871 |  82.93% |                                                              
+  | url            | 1290137 |  100.00% |  
+  | year           |  1235394 |  95.76% |                                          
+  | month          | 1235394 |  95.76% |                                                              
+  | type           | 1290137 | 100.00%  |                                                              
+  | venue          | 1290125 |  100.00% |                                                              
+  | source         | 1290137 | 100.00% |                                                              
+  | video_url      | 18839  |  1.46%  |                                         
+  | video_path     |   18839 |  1.46%  |                                                              
+  | thumbnail_url  | 18839  | 1.46% |                                                              
+  | pdf_url        | 385177 | 29.86% |                                                              
+  | pdf_path       | 385177  |  29.86% |                                         
+  | inCitations    | 1158297   |  89.78%   |                                                              
+  | outCitations   | 1241198  | 96.21% |
 
 ## <span id="head12"> 执行方法</span>
 
@@ -255,7 +255,7 @@ pip install -r requirements.txt
 
 ### <span id="head23"> 3. ScienceDirect</span>
 
-#### 1.1 网站遍历逻辑
+#### 3.1 网站遍历逻辑
 
 - 由于ScienceDirect页面使用异步加载模式，直接通过网页解析不能获取到任何论文列表，所以通过网页开发者工具截取查询请求，通过分析查询请求的构成，手动拼接查询请求获取论文列表
     - 返回结果为json格式，解析json格式获取论文列表中每个论文的链接
@@ -280,7 +280,7 @@ pip install -r requirements.txt
   - 通过接口"www.sciencedirect.com/search/api?"依次构建date、cid等的字段，查询某一年某一期刊的论文列表，并通过offset控制查询进度，
   - 解析json格式，找到其中包含的论文信息，在'searchResults'键下，找到每个论文主页的链接，依次构建请求访问论文主页
 
-#### 1.2 网站解析逻辑
+#### 3.2 网站解析逻辑
 
 - 每个单独文献的解析如下，使用xpath进行内容提取
 
@@ -356,7 +356,7 @@ Mongo.mongodb_delete(site, field, value)
 ```python
 Mongo.mongodb_find(site, field, value)
 ```
-### 6.Elasticsearch可视化展示平台
+### <span id="head26"> 6.Elasticsearch可视化展示平台</span>
 
 1. 执行流程
 
@@ -365,7 +365,7 @@ Mongo.mongodb_find(site, field, value)
 2. 数据可视化
 
    访问Elasticsearch控制台: localhost:5601，并在dashboard中找到数据。
-## <span id="head26"> 代码及文件结构</span>
+## <span id="head27"> 代码结构</span>
 - 代码结构
 ```
 │  README.md
@@ -394,7 +394,4 @@ Mongo.mongodb_find(site, field, value)
                 Springer.py //Springer网站解析逻辑
                 __init__.py
 ```
-- 文件结构
-```
 
-```
