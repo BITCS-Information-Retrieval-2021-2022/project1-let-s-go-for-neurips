@@ -32,21 +32,16 @@ class SciencedirectSpider(scrapy.Spider):
         with open('venue_cid', 'r') as f:
             self.venue_list = f.readlines()
         self.client = pymongo.MongoClient(
-            host='10.1.114.77', port=27017, tz_aware=True)
+            host='127.0.0.1', port=27017, tz_aware=True)
         self.db = self.client.pc
         self.docs = self.db.get_collection("Process")
-        self.title = 'ScienceDirectsys'
-        self.year = 2015
+        self.title = 'ScienceDirect'
         self.config = self.docs.find_one({'title': self.title})
 
     def start_requests(self):
         logging.info('start_requests')
-        if self.config is None:
-            venue_id = 0
-            year = self.year
-        else:
-            venue_id = int(self.config['venue_id'])
-            year = int(self.config['year'])
+        venue_id = int(self.config['venue_id'])
+        year = int(self.config['year'])
 
         next_url = 'https://www.sciencedirect.com/search?date=' + str(year) + "&cid=" \
             + str(self.venue_list[venue_id]) + "&show=100&offset=0"
