@@ -181,3 +181,26 @@ class StatisticsMiddleware(object):
         scrapy_count = self.stats.get_value('item_scraped_count')
         if scrapy_count:
             print(scrapy_count)
+
+class ProxiesMiddleware(object):
+    def __init__(self, settings):
+        super(ProxiesMiddleware, self).__init__()
+        self.step = 0
+        self.proxypool_url = 'http://127.0.0.1:5555/random'
+        self.proxy = self.get_random_proxy()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+    def get_random_proxy(self):
+        proxy = requests.get(self.proxypool_url).text.strip()
+        logging.info('---get_random_proxy--- ' + str(proxy))
+        return proxy
+
+    def process_request(self, request, spider):
+        self.step += 1
+        if self.step % 1000 == 0:
+            self.proxy = self.get_random_proxy()
+        request.meta['proxy'] = 'http://' + self.proxy
+        request.headers["Connection"] = "close"
