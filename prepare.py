@@ -28,7 +28,7 @@ def prepare_mongodb():
 
     db.mongodb_insert("Process", {
         'title': 'ScienceDirect',
-        'year': '2000',
+        'year': '2021',
         'venue_id': 0
     })
 
