@@ -59,6 +59,3 @@ class VideoPipeline(FilesPipeline):
 
     def file_path(self, request, response=None, info=None):
         return request.meta.get("path")
-
-
-
