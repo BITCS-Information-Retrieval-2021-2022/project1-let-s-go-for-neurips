@@ -254,6 +254,7 @@ cd /usr/local/mongodb/
     ```
 
 2. 安装依赖包
+
     ``` pip3 install -r requirements.txt ```
 
 3. 安装和配置 Redis
@@ -265,6 +266,7 @@ cd /usr/local/mongodb/
     ```
 
 4. 运行代理池
+
     ``` python3 run.py```
 
 
@@ -274,7 +276,6 @@ cd /usr/local/mongodb/
     class ProxiesMiddleware(object):
       def __init__(self, settings):
           super(ProxiesMiddleware, self).__init__()
-          self.step = 0
           self.proxypool_url = 'http://127.0.0.1:5555/random'
           self.proxy = self.get_random_proxy()
 
@@ -284,13 +285,10 @@ cd /usr/local/mongodb/
 
       def get_random_proxy(self):
           proxy = requests.get(self.proxypool_url).text.strip()
-          logging.info('---get_random_proxy--- ' + str(proxy))
           return proxy
 
       def process_request(self, request, spider):
-          self.step += 1
-          if self.step % 1000 == 0:
-              self.proxy = self.get_random_proxy()
+          self.proxy = self.get_random_proxy()
           request.meta['proxy'] = 'http://' + self.proxy
           request.headers["Connection"] = "close"
     ```
