@@ -8,6 +8,7 @@ from scrapy import signals
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 from scrapy.http import HtmlResponse
+from twisted.internet import task
 from fake_useragent import UserAgent
 import logging
 from selenium import webdriver
@@ -130,7 +131,8 @@ class RandomUserAgentMiddleware(object):
     def process_request(self, request, spider):
         def get_ua():
             return getattr(self.ua, self.ua_type)
-        #logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
+
+        # logging.info('$-Message From Random UserAgent Middleware: ' + get_ua())
         request.headers.setdefault('User-Agent', get_ua())
 
 
@@ -179,4 +181,3 @@ class StatisticsMiddleware(object):
         scrapy_count = self.stats.get_value('item_scraped_count')
         if scrapy_count:
             print(scrapy_count)
-

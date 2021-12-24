@@ -54,7 +54,7 @@ class ElasticsearchManager:
                     item['outCitations'] = 0
                 if item['year'] == "":
                     item['year'] = 0
-                if item['month'] =="":
+                if item['month'] == "":
                     item['month'] = 0
                 new_item = {
                     "title": item['title'],
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     #     'time':datetime.datetime.now()
     # })
     # ela.elas_query()
-    #ela.elas_delete('paper')
+    # ela.elas_delete('paper')
     # ela.elas_delete('test')
     # db = MongoManager()
     # db.mongodb_insert("Process", {

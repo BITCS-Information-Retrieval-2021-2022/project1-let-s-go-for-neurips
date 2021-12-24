@@ -32,7 +32,7 @@ class SpringerSpider(scrapy.Spider):
         super(SpringerSpider, self).__init__()
         self.startPage = 1
         self.pageSize = 20
-        self.startTime = get_project_settings()\
+        self.startTime = get_project_settings() \
             .get('START_TIME')
         # self.proxyUpdateDelay =
         # get_project_settings().get('PROXY_UPDATE_DELAY')
@@ -74,7 +74,8 @@ class SpringerSpider(scrapy.Spider):
         # )
 
         for journal_item in journal_items:
-            journal_num = str(journal_item.extract()).replace(str(re.search(r'/(.*?)/', journal_item.extract()).group(0)), "")
+            journal_num = str(journal_item.extract()).replace(
+                str(re.search(r'/(.*?)/', journal_item.extract()).group(0)), "")
             next_url = 'https://link.springer.com/search/page/1?search-within=Journal&facet-journal-id=' \
                        + journal_num + '&query='
             # print(next_url)
@@ -94,7 +95,8 @@ class SpringerSpider(scrapy.Spider):
 
         if self.startPage < page_num:
             self.startPage += 1
-            next_url = 'https://link.springer.com/search/page/' + str(self.startPage) + '?facet-content-type=%22Journal%22'
+            next_url = 'https://link.springer.com/search/page/' + str(
+                self.startPage) + '?facet-content-type=%22Journal%22'
             # print("——————翻页————————")
             yield scrapy.Request(
                 next_url,
@@ -116,7 +118,8 @@ class SpringerSpider(scrapy.Spider):
         # print(page_num)
 
         for chapter_item in chapter_items:
-            chapter_num = str(chapter_item.extract()).replace(str(re.search(r'/(.*)/', chapter_item.extract()).group(0)), "")
+            chapter_num = str(chapter_item.extract()).replace(
+                str(re.search(r'/(.*)/', chapter_item.extract()).group(0)), "")
             next_url = 'https://link.springer.com/search/page/1?facet-content-type=Chapter&query=&facet-eisbn=' + chapter_num
             # print(next_url)
             yield scrapy.Request(
@@ -235,7 +238,7 @@ class SpringerSpider(scrapy.Spider):
         type = response.xpath('//li[@class="c-bibliographic-information__list-item"]/p/text()').extract()
         date = response.xpath('//span[@class="c-bibliographic-information__value"]/time/text()').extract()
         for i in range(len(type)):
-            if(type[i] == 'Published'):
+            if (type[i] == 'Published'):
                 publishx = date[i].split(' ')
                 item['year'] = publishx[2]
                 item['month'] = wordtonumber[publishx[1]]

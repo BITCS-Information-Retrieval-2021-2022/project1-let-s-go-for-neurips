@@ -8,6 +8,7 @@ def prepare_folder():
         if not os.path.exists(folder):
             os.makedirs(folder)
 
+
 def prepare_mongodb():
     db = MongoManager()
     db.mongodb_insert("Process", {
@@ -19,7 +20,11 @@ def prepare_mongodb():
         'PageSize': 20
     })
 
-    # TODO Springer
+    db.mongodb_insert("Process", {
+        'title': 'Springer',
+        'type': 'Journal',
+        'page': 1
+    })
 
     # TODO ScienceDirect
 
