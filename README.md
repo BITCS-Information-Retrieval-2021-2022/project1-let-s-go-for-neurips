@@ -520,6 +520,7 @@ Mongo.mongodb_find(site, field, value)
         │  items.py //数据结构定义
         │  middlewares.py //动态切换ip代理
         │  data_manager.py  // 数据交互逻辑
+        │  venue_cid  // 存放ScienceDirect期刊id号
         │  pipelines.py // PDF与视频下载流水线
         │  proxy.py //ip池爬取
         │  settings.py //爬虫配置文件，包括日志，文件下载路径等
