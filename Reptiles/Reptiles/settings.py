@@ -61,6 +61,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     'Reptiles.middlewares.RandomUserAgentMiddleware': 543,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    # 'Reptiles.middlewares.ProxiesMiddleware': 700,
 }
 DOWNLOAD_TIMEOUT = 100
 # DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
