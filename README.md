@@ -37,12 +37,12 @@
 
 | 姓名                                    | 学号       | 分工                           |
 | --------------------------------------- | ---------- | ------------------------------ |
-| 王昊    | 3120211035 | ACM网站爬取逻辑，Elasticsearch检索系统，工作整合与对接         |
+| 王昊    | 3120211034 | ACM网站爬取逻辑，Elasticsearch检索系统，工作整合与对接         |
 | 刘文鼎  | 3120211080 | MongoDB数据库搭建及接口实现，数据库相关功能实现        |
 | 何鹏    | 3120211035 | ScienceDirect网站爬取逻辑，IP池动态获取 |
-| 王星煜  |3120211055  |          |
-| 徐天祥  |3220210891  |          |
-| 杨雪    | 3120211001 |          |
+| 王星煜  |3120211055  |   系统框架搭建，代理IP池爬取       |
+| 徐天祥  |3120211026  |   Springer网站爬取逻辑       |
+| 杨雪    | 3120211001 |  部分ACM网站爬取逻辑，汇报材料   |
 
 
 ## <span id="head4"> 功能特色</span>
@@ -108,29 +108,22 @@
 
 ## <span id="head12"> 执行方法</span>
 
-### <span id="head13"> 1、运行环境</span>
+### <span id="head13"> 1.运行环境</span>
 
 系统：Windows、Linux、MacOS
 
 软件：python3
 
-### <span id="head14"> 2、安装依赖</span>
+### <span id="head14"> 2.安装依赖</span>
 
 ```
 pip install -r requirements.txt
 ```
 
-### <span id="head15"> 3、运行</span>
 
-- 将仓库克隆至本地
+### <span> 3.安装可视化组件</span>
 
-- 修改`config.yaml`和`start_urls.txt`(如果需要)
-
-- 执行`scrapy crawl ***`，例如爬取ACM网站则执行`scrapy crawl ACM`
-
-### <span> 4、安装可视化组件</span>
-
-#### <span> 4.1 安装ElasticSearch </span>
+#### <span> 3.1 安装ElasticSearch </span>
 
 1. 下载ElasticSearch
 
@@ -152,7 +145,7 @@ pip install -r requirements.txt
    ```curl 'localhost:9200'```
     若有欢迎信息提示，则代表安装成功
    
-#### <span> 4.1 Kibana </span>
+#### <span> 3.2 Kibana </span>
 
 1. 下载Kibana
 
@@ -171,6 +164,20 @@ pip install -r requirements.txt
 4. 检查安装结果
    
     访问'localhost:5601"，若看到控制台页面，则证明安装成功
+
+### <span id="head15"> 4.运行</span>
+
+- 将仓库克隆至本地
+
+- 执行准备程序 ```python prepare.py```
+
+- 切换路径 ```cd Reptiles```
+
+- 更改脚本权限 ```chmod +x run.sh```
+
+- 运行脚本 ``./run.sh ACM``
+其中 
+
 ## <span id="head16"> 第三方库依赖</span>
 参见`./requirements.txt`
 ## <span id="head17"> 系统架构</span>

@@ -80,7 +80,7 @@ class ElasticsearchManager:
 
 class MongoManager:
     def __init__(self):
-        self.myclient = pymongo.MongoClient(host='10.1.114.77', port=27017, tz_aware=True)
+        self.myclient = pymongo.MongoClient(host='127.0.0.1', port=27017, tz_aware=True)
         self.dblist = self.myclient.list_database_names()
         self.mydb = None
         self.collist = None
@@ -93,7 +93,7 @@ class MongoManager:
 
         # docs.insert(info)
 
-        # checksum取title中所有字母的小写
+        # checksum取tle中所有字母的小写
         checksum = re.sub(r'[\W\d\_]', "", info['title']).lower()
         info['checksum'] = checksum
 
@@ -119,7 +119,7 @@ class MongoManager:
 
 if __name__ == '__main__':
     ela = ElasticsearchManager()
-    ela.batch_inset('/home/liuchi/wh/bit/project1-let-s-go-for-neurips/paper_new.json')
+    ela.batch_inset('/home/liuchi/wh/bit/project1-let-s-go-for-neurips/paper_final.json')
     # ela.elas_insert({
     #     'title':'ACM',
     #     'year': 2021,
