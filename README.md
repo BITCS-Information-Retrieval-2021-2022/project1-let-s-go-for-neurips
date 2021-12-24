@@ -437,7 +437,7 @@ cd /usr/local/mongodb/
 ### <span id="head24"> 4. IP池服务</span>
 - 对于ACM、Springer、ScienceDirect网站的反爬限制，采用动态代理IP的方式，使用开源GitHub项目ProxyPool https://github.com/Python3WebSpider/ProxyPool
 - 从众多代理源网站爬取IP，存放在redis数据库中，并实时更新，定期从redis数据库中取出新的IP，使用这些IP来访问网站。
-- 新建ProxiesMiddleware中间件，用于更新强求的代理。
+- 新建ProxiesMiddleware中间件，用于更新请求的代理。
 
 
   ```
