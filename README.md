@@ -258,6 +258,7 @@ cd /usr/local/mongodb/
     ``` pip3 install -r requirements.txt ```
 
 3. 安装和配置 Redis
+    https://www.runoob.com/redis/redis-install.html
     ```
     export REDIS_HOST='localhost'
     export REDIS_PORT=6379
