@@ -29,7 +29,7 @@ class SciencedirectSpider(scrapy.Spider):
 
     def __init__(self):
         super(SciencedirectSpider, self).__init__()
-        with open('venue_cid', 'r') as f:
+        with open('./Reptiles/venue_cid', 'r') as f:
             self.venue_list = f.readlines()
         self.client = pymongo.MongoClient(
             host='127.0.0.1', port=27017, tz_aware=True)
