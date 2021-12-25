@@ -39,7 +39,7 @@ class SpringerSpider(scrapy.Spider):
         # getProxy().main()
         self.url = 'https://link.springer.com/search/page/{}?facet-content-type=%22{}%22'
 
-        self.client = pymongo.MongoClient(host='10.1.114.77', port=27017, tz_aware=True)
+        self.client = pymongo.MongoClient(host='localhost', port=27017, tz_aware=True)
         self.db = self.client.pc
         self.docs = self.db.get_collection("Process")
         self.config = self.docs.find_one({'title': 'Springer'})

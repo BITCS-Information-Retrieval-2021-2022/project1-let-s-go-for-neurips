@@ -78,38 +78,38 @@
 
 ## <span id="head11"> 整体效果</span>
 
-- 数据库中共有记录1290137条
+- 数据库中共有记录1815845条
 
-- 下载PDF共***篇
+- 下载PDF共237977篇
 
 
   **具体统计**（注：由于增量式爬取，有些论文被多个网站爬取，各网站爬取之和多于数据库记录）
 
   | 网站名        | 爬取数量 | 下载PDF数量 |
   | ------------- | -------- | ----------- |
-  | ACM           |   1015174   |   197884       |
-  | Springer      |  196789   |        |
-  | ScienceDirect |  78174  |    0    |
+  | ACM           |   1014506    |   197884       |
+  | Springer      |  197272   |  40093     |
+  | ScienceDirect |  604067  |    0    |
 
   | 字段名          | 数量   | 覆盖率 | 
   | ------------   | ------ | ------ |
-  | title          | 1290137 |  100.00% |
-  | abstract       |  1217294 |  94.35%  |                                                              
-  | authors        | 1290137 |  100.00%  |                                                              
-  | doi            | 1069871 |  82.93% |                                                              
-  | url            | 1290137 |  100.00% |  
-  | year           |  1235394 |  95.76% |                                          
-  | month          | 1235394 |  95.76% |                                                              
-  | type           | 1290137 | 100.00%  |                                                              
-  | venue          | 1290125 |  100.00% |                                                              
-  | source         | 1290137 | 100.00% |                                                              
-  | video_url      | 18839  |  1.46%  |                                         
-  | video_path     |   18839 |  1.46%  |                                                              
-  | thumbnail_url  | 18839  | 1.46% |                                                              
-  | pdf_url        | 385177 | 29.86% |                                                              
-  | pdf_path       | 385177  |  29.86% |                                         
-  | inCitations    | 1158297   |  89.78%   |                                                              
-  | outCitations   | 1241198  | 96.21% |
+  | title          | 1815845 |  100.00% |
+  | abstract       |  1254346 |  69.08% |                                                              
+  | authors        | 1790760 |  98.62%  |                                                              
+  | doi            | 1595599 |  87.87%|                                                              
+  | url            | 1815845 |  100.00% |  
+  | year           |  1760724 |  96.96%|                                          
+  | month          | 1760722 |  96.96% |                                                              
+  | type           | 1815845 |  100.00%|                                                              
+  | venue          | 1815833 |  100.00% |                                                              
+  | source         | 1815845 | 100.00% |                                                              
+  | video_url      | 18841  |  1.04%  |                                         
+  | video_path     |   18841 |  1.04%  |                                                              
+  | thumbnail_url  | 18841  | 1.46% |                                                              
+  | pdf_url        | 916891 |  50.49% |                                                              
+  | pdf_path       | 916891  |  50.49% |                                         
+  | inCitations    | 1202192   |  66.21%  |                                                              
+  | outCitations   | 1285093  | 70.78%  |
 
 ## <span id="head12"> 执行方法</span>
 
@@ -289,7 +289,7 @@ cd /usr/local/mongodb/
 - 更改脚本权限 ```chmod +x run.sh```
 
 - 运行脚本 ```./run.sh ACM```
-其中ACM可替换为其他爬取源，包括Springer,ScienceDirect.爬虫运行日志位于Logs文件内
+其中ACM可替换为其他爬取源，包括Springer,ScienceDirect。爬虫运行产生的日志位于Logs文件内。
 
 ## <span id="head16"> 第三方库依赖</span>
 参见`./requirements.txt`
@@ -502,7 +502,7 @@ Mongo.mongodb_find(site, field, value)
 
 2. 数据可视化
 
-    访问Elasticsearch控制台localhost:5601，并在dashboard中找到数据，可根据提供api自定义可视化控件。
+    访问Elasticsearch控制台localhost:5601，并在dashboard的paper索引中找到数据，可根据提供api自定义可视化控件。
 ![elastic](./extra/elastic.jpg)
 
 ## <span id="head27"> 代码结构</span>
@@ -510,10 +510,9 @@ Mongo.mongodb_find(site, field, value)
 ```
 │  README.md
 │  requirements.txt
-│
+│  prepare.py //准备脚本
 └─Reptiles
     │  scrapy.cfg
-    │  start.bat
     │  run.sh //启动脚本
     └─Reptiles
         │  convert_json.py
@@ -525,10 +524,8 @@ Mongo.mongodb_find(site, field, value)
         │  proxy.py //ip池爬取
         │  settings.py //爬虫配置文件，包括日志，文件下载路径等
         │  __init__.py
-        │
         ├─configs
         │      proxylist_big.txt //代理ip存放文件
-        │
         └─spiders
                 ACM.py // ACM网站解析逻辑
                 ScienceDirect.py //ScienceDirect网站解析逻辑

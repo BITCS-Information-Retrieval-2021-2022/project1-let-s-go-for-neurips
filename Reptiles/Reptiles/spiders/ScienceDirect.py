@@ -5,6 +5,9 @@ import json
 import logging
 import re
 import pymongo
+# import os
+# os.environ["http_proxy"] = "http://127.0.0.1:7890"
+# os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 wordtonumber = {
     'January': '1',
@@ -19,6 +22,7 @@ wordtonumber = {
     'October': '10',
     'November': '11',
     'December': '12',
+
 }
 
 
@@ -29,19 +33,24 @@ class SciencedirectSpider(scrapy.Spider):
 
     def __init__(self):
         super(SciencedirectSpider, self).__init__()
-        with open('./Reptiles/venue_cid', 'r') as f:
+        with open('venue_cid', 'r') as f:
             self.venue_list = f.readlines()
         self.client = pymongo.MongoClient(
-            host='127.0.0.1', port=27017, tz_aware=True)
+            host='localhost', port=27017, tz_aware=True)
         self.db = self.client.pc
         self.docs = self.db.get_collection("Process")
-        self.title = 'ScienceDirect'
+        self.title = 'ScienceDirectsys'
+        self.year = 2015
         self.config = self.docs.find_one({'title': self.title})
 
     def start_requests(self):
         logging.info('start_requests')
-        venue_id = int(self.config['venue_id'])
-        year = int(self.config['year'])
+        if self.config is None:
+            venue_id = 0
+            year = self.year
+        else:
+            venue_id = int(self.config['venue_id'])
+            year = int(self.config['year'])
 
         next_url = 'https://www.sciencedirect.com/search?date=' + str(year) + "&cid=" \
             + str(self.venue_list[venue_id]) + "&show=100&offset=0"
@@ -213,7 +222,17 @@ class SciencedirectSpider(scrapy.Spider):
                 outCitations = str(tmpstr[22:])
                 break
         item['outCitations'] = outCitations
-        item['pdf_url'] = item['url'] + '/pdfft'
+        pdf_url = ''
+        for paper_item in scripts:
+            tmpstr = re.search('"md5":"[a-zA-Z0-9]*"', paper_item.extract())
+            if tmpstr is not None:
+                md5 = tmpstr.group()[7:-1]
+                tmpstr = re.search(
+                    '"pid":"([a-zA-Z0-9]|\\-|\\.)*.pdf"', paper_item.extract())
+                pid = tmpstr.group()[7:-1]
+                pdf_url = response.url + '/pdf?md5=' + md5 + '&pid=' + pid
+                break
+        item['pdf_url'] = pdf_url
         # item['pdf_path'] = './PDF/ScienceDirect/' + re.sub(r'[^\w\s]', '', item['title']).lower().replace(' ','_')+'.pdf'
         item['pdf_path'] = ''
         pii = re.split('/', response.url)[-1]

@@ -19,7 +19,7 @@ from .data_manager import ElasticsearchManager
 
 class ReptilesPipeline:
     def __init__(self):
-        self.client = pymongo.MongoClient(host='10.1.114.77', port=27017, tz_aware=True)
+        self.client = pymongo.MongoClient(host='localhost', port=27017, tz_aware=True)
         self.ela_client = ElasticsearchManager()
 
     def process_item(self, item, spider):
