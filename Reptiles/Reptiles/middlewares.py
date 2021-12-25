@@ -14,6 +14,7 @@ import logging
 from selenium import webdriver
 import time
 import random
+import requests
 
 
 class ReptilesSpiderMiddleware:
@@ -181,6 +182,7 @@ class StatisticsMiddleware(object):
         scrapy_count = self.stats.get_value('item_scraped_count')
         if scrapy_count:
             print(scrapy_count)
+
 
 class ProxiesMiddleware(object):
     def __init__(self, settings):
